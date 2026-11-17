@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cff472a75033ad4380bb934c4d375f3, type: 3}
+  m_Name: PhoenixSeed
+  m_EditorClassIdentifier: Assembly-CSharp::CardData
+  cardName: Phoenix Seed
+  family: 18
+  function: 3
+  cost: 5
+  effect: 1
+  power: 15
+  duration: 3
+  description: Revive a fallen ally at 50%. Once per bout.
+  art: {fileID: 2800000, guid: 580520b79f858334a9e0ea15c6bbe2d2, type: 3}
