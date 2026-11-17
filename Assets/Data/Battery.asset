@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cff472a75033ad4380bb934c4d375f3, type: 3}
+  m_Name: Battery
+  m_EditorClassIdentifier: Assembly-CSharp::CardData
+  cardName: Battery
+  family: 16
+  function: 3
+  cost: 2
+  effect: 3
+  power: 2
+  duration: 3
+  description: Store Libido in this card; release it at +50%.
+  art: {fileID: 2800000, guid: be71d3d2bad2b394399a178be9e73e4f, type: 3}
