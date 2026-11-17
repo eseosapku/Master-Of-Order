@@ -1,0 +1,101 @@
+Family,Function,Name,Cost,Effect,Power,Description
+Chrono,Intuition,Stillframe,4,Freeze,3,Freeze an enemy for 3 seconds.
+Chrono,Intuition,Haste Loop,3,Haste,6,"Move at 1.5x speed for 6 s, then 0.5x for 3 s."
+Chrono,Intuition,Rewind,5,Rewind,3,Return your position and Body to 3 seconds ago. Libido stays spent.
+Chrono,Intuition,Stretched Second,3,Slow,5,"Everything near you moves at 25% speed, your throws too."
+Chrono,Intuition,Delay,2,Delay,4,The enemy's next card resolves 4 seconds late.
+Foresight,Intuition,Glimpse,1,Reveal,5,See the enemy's next card for 5 seconds.
+Foresight,Intuition,Read the Hand,3,Reveal,5,Reveal 2 hidden enemy cards for the bout.
+Foresight,Intuition,Ghost Path,2,Reveal,5,Show the enemy's next attack path as a red line.
+Foresight,Intuition,Premonition,3,Counter,1,"Name a family. If the enemy plays it, it fizzles."
+Foresight,Intuition,Counter-Fate,4,Counter,1,Pre-load a card that fires when you are next hit.
+Echo,Intuition,Afterimage,2,Damage,24,Your last attack repeats at 50% two seconds later.
+Echo,Intuition,Reprise,3,Copy,1,Replay the last card you used without spending it.
+Echo,Intuition,Resonance,3,Damage,27,Each consecutive hit on one target deals 15% more.
+Echo,Intuition,Stolen Echo,4,Copy,1,Replay the enemy's last card as yours at 60%.
+Echo,Intuition,Long Echo,4,Damage,30,Damage dealt this round repeats next round.
+Fortune,Intuition,Coin Toss,1,Damage,21,"Next hit: 50% double damage, 50% nothing."
+Fortune,Intuition,Loaded Die,3,Utility,1,The next random effect goes your way.
+Fortune,Intuition,Jinx,2,Counter,1,The enemy's next card has a 40% chance to fizzle.
+Fortune,Intuition,All In,5,Damage,33,Spend all Libido. Deal twice what you spent.
+Fortune,Intuition,Second Draw,2,Utility,1,Swap one Orbit card for a random Archive card.
+Phantasm,Intuition,Decoy,2,Illusion,4,Spawn a fake you that draws attacks.
+Phantasm,Intuition,False Card,2,Illusion,4,Throw a bluff disguised as any card.
+Phantasm,Intuition,Fog of Self,3,Illusion,4,Become invisible for 4 seconds.
+Phantasm,Intuition,Mirage Field,4,Illusion,4,Your last card appears three times; one is real.
+Phantasm,Intuition,Nightmare,4,Status,5,The enemy sees you in place of their ally for 3 s.
+Force,Sensation,Strike,1,Damage,21,"A clean, heavy hit."
+Force,Sensation,Shockwave,3,Damage,27,A ring that knocks everyone back.
+Force,Sensation,Pierce,3,Damage,27,Passes straight through Ward cards.
+Force,Sensation,Charged Blow,2,Damage,24,Grows stronger the longer you hold it.
+Force,Sensation,Shatter,4,Dispel,1,Destroy an active card effect on the field.
+Velocity,Sensation,Dash,1,Haste,6,Blink 5 metres.
+Velocity,Sensation,Slow,2,Slow,5,Target moves at 50% for 5 seconds.
+Velocity,Sensation,Tailwind,3,Haste,6,Your throws fly faster and further this round.
+Velocity,Sensation,Frostbite Step,3,Slow,5,A slowed target is hurt by every step.
+Velocity,Sensation,Whiplash,4,Haste,6,Swap your speed with the enemy's for 5 s.
+Ward,Sensation,Shield,1,Shield,1,Block the next hit.
+Ward,Sensation,Thorn Ward,3,Shield,1,Block and return 30% of the damage.
+Ward,Sensation,Bastion,4,Shield,1,A dome: nothing in or out for 4 seconds.
+Ward,Sensation,Absorb,3,Shield,1,Block a hit and turn it into Libido.
+Ward,Sensation,Last Stand,5,Shield,1,Survive one lethal hit at 1 Body.
+Venom,Sensation,Sting,1,Poison,4,Poison that ticks for 6 seconds.
+Venom,Sensation,Rot,3,Status,5,For 8 s the target's healing hurts instead.
+Venom,Sensation,Numbing,2,Status,5,The target's next card costs 2 more.
+Venom,Sensation,Spreading Blight,4,Poison,4,Poison jumps to the nearest fighter on hit.
+Venom,Sensation,Wither,4,Status,5,Cut the target's max Body by 10% this bout.
+Hunt,Sensation,Mark,1,Status,5,The marked target takes 20% more from all sources.
+Hunt,Sensation,Scent,2,Reveal,5,See a marked target through illusions.
+Hunt,Sensation,Snare,3,Freeze,3,A hidden trap roots whoever steps in for 3 s.
+Hunt,Sensation,Pursuit,3,Damage,27,A spectral hound chases the marked target.
+Hunt,Sensation,Apex,5,Damage,33,Triple damage on a marked target under 30% Body.
+Binding,Thinking,Chain,2,Freeze,3,Tether an enemy within 2 metres of their spot.
+Binding,Thinking,Shackle,3,Seal,3,Lock one of the enemy's throwing hands.
+Binding,Thinking,Link Lock,3,Status,5,Chain both enemies; parting over 4 m hurts both.
+Binding,Thinking,Name Bind,4,Freeze,3,Speak the enemy's true name to stop them for 5 s.
+Binding,Thinking,Gravebind,4,Seal,3,A fallen ally cannot be revived next round.
+Contract,Thinking,Wager,2,Damage,24,Both stake 20 Body; the next hit takes the pot.
+Contract,Thinking,Oath of Blood,3,Status,5,Take 10 now; your next 3 hits deal 50% more.
+Contract,Thinking,Terms,3,Status,5,Ban an action. Breaking it costs the enemy 25.
+Contract,Thinking,Ransom,4,Seal,3,Lock an enemy card until they pay 4 Libido.
+Contract,Thinking,Clause,4,Seal,3,"If you lose this round, the winner loses a card."
+Seal,Thinking,Silence,2,Seal,3,The enemy cannot play a card for 3 seconds.
+Seal,Thinking,Card Lock,3,Seal,3,Seal one visible Orbit card for 2 rounds.
+Seal,Thinking,Null Zone,4,Dispel,1,An area where no card effects work.
+Seal,Thinking,Dispel,2,Dispel,1,End one active enemy effect.
+Seal,Thinking,Exile,5,Seal,3,Remove one enemy card for the bout. Once per bout.
+Mirror,Thinking,Reflect,3,Counter,1,Bounce the next thrown attack back.
+Mirror,Thinking,Mirror Step,3,Counter,1,"Copy the enemy's movement, flipped, for 6 s."
+Mirror,Thinking,Inversion,4,Counter,1,The enemy's next buff becomes a debuff.
+Mirror,Thinking,Return to Sender,4,Counter,1,Move every status on you to the enemy.
+Mirror,Thinking,Glass Heart,3,Damage,27,Share your next damage with the enemy; take 25% more.
+Mimic,Thinking,Copy,3,Copy,1,Copy the enemy's last card.
+Mimic,Thinking,Borrowed Form,4,Copy,1,Take the enemy's stats for 6 seconds.
+Mimic,Thinking,Study,1,Copy,1,"After 3 enemy hits land, copy one for free."
+Mimic,Thinking,Steal,5,Copy,1,Take one enemy card for the rest of the bout.
+Mimic,Thinking,Parrot,2,Status,5,Echo the enemy's shout to weaken their next card.
+Leech,Feeling,Drain Touch,2,Drain,12,Heal for 50% of the damage dealt.
+Leech,Feeling,Blood Tether,3,Drain,12,Drain 5 Body per second while within 3 m.
+Leech,Feeling,Vampire Mark,3,Drain,12,All your damage on the target heals you 25%.
+Leech,Feeling,Feast,4,Drain,12,Heal for all damage you dealt this round.
+Leech,Feeling,Martyr's Draw,3,Heal,15,Move Body between you and your partner.
+Siphon,Feeling,Sap,1,Siphon,2,Steal 2 Libido.
+Siphon,Feeling,Drain Field,3,Siphon,2,Enemies inside lose 1 Libido per second.
+Siphon,Feeling,Overload,3,Siphon,2,Their next card costs double; you get the extra.
+Siphon,Feeling,Burnout,4,Siphon,2,The enemy gains no Libido next round.
+Siphon,Feeling,Battery,2,Siphon,2,Store Libido in this card; release it at +50%.
+Bond,Feeling,Shared Pain,3,Link,5,Split damage to you 50/50 with the enemy.
+Bond,Feeling,Ally Link,2,Link,5,Give one of your card effects to your partner.
+Bond,Feeling,Sworn,4,Link,5,"Under 25% Body, your partner deals 50% more."
+Bond,Feeling,Severance,4,Dispel,1,Break every link; each deals 10 to its owner.
+Bond,Feeling,Proxy,3,Link,5,Take all damage meant for your partner for 5 s.
+Mend,Feeling,Patch,1,Heal,15,Heal 15 Body.
+Mend,Feeling,Regrow,3,Heal,15,Heal 40 Body over 8 seconds.
+Mend,Feeling,Cleanse,2,Dispel,1,Remove every status on you.
+Mend,Feeling,Steady,3,Heal,15,Restore 30 Ego.
+Mend,Feeling,Phoenix Seed,5,Heal,15,Revive a fallen ally at 50%. Once per bout.
+Dread,Feeling,Intimidate,1,Status,5,Push the enemy back 3 metres.
+Dread,Feeling,Panic,3,Status,5,Shuffle the enemy's Orbit so they grab the wrong card.
+Dread,Feeling,Haunt,3,Status,5,Add 20 to the enemy's Shadow.
+Dread,Feeling,Paralysis,4,Freeze,3,The enemy cannot throw for 3 seconds.
+Dread,Feeling,Despair,5,Status,5,Drain 40 Ego. At 0 the enemy is Possessed.
