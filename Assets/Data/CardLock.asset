@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cff472a75033ad4380bb934c4d375f3, type: 3}
+  m_Name: CardLock
+  m_EditorClassIdentifier: Assembly-CSharp::CardData
+  cardName: Card Lock
+  family: 12
+  function: 2
+  cost: 3
+  effect: 13
+  power: 3
+  duration: 3
+  description: Seal one visible Orbit card for 2 rounds.
+  art: {fileID: 2800000, guid: a184c884bed23924c8cd120004194820, type: 3}
