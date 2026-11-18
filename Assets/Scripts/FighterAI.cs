@@ -35,7 +35,7 @@ public class FighterAI : MonoBehaviour
         nextThink = Time.time + UnityEngine.Random.Range(1.5f, 3.5f);
         foreach (Fighter f in FindObjectsByType<Fighter>(FindObjectsSortMode.None))
         {
-            if (f != fighter && f.Team != fighter.Team && f.Team != 2) foes.Add(f);
+            if (f != fighter) foes.Add(f);
         }
     }
 
@@ -66,7 +66,7 @@ public class FighterAI : MonoBehaviour
         foreach (Fighter f in foes)
         {
             float d = Vector3.Distance(f.transform.position, transform.position);
-            if (!f.IsDown && f.isActiveAndEnabled && d < bestDist)
+            if (!f.IsDown && f.isActiveAndEnabled && f.Team != fighter.Team && f.Team != 2 && d < bestDist)
             {
                 bestDist = d;
                 best = f;
