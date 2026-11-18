@@ -86,7 +86,7 @@ public class CardOrbit : MonoBehaviour
             Quaternion around = Quaternion.Euler(0f, a, 0f);
             Vector3 pos = center + around * Vector3.forward * radius + Vector3.up * Mathf.Sin(t * 1.3f + i * 0.7f) * 0.015f;
             Quaternion rot = Quaternion.LookRotation(head.position - pos);
-            if (owner != null && Application.isPlaying) cards[i].SetReady(owner.Libido >= cards[i].Data.cost);
+            if (owner != null && Application.isPlaying) cards[i].SetReady(!owner.IsDown && owner.Libido >= cards[i].Data.cost);
             if (snap) cards[i].transform.SetPositionAndRotation(pos, rot);
             else cards[i].Hold(pos, rot, follow);
         }
