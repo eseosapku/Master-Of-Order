@@ -28,7 +28,7 @@ public class Fighter : MonoBehaviour
     public event Action<Fighter> EgoBroken;
 
     public string DisplayName => displayName;
-    public int Team => team;
+    public int Team { get => team; set => team = value; }
     public float Body { get; private set; }
     public float Ego { get; private set; }
     public float Shadow { get; private set; }
