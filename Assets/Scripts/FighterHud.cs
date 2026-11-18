@@ -3,12 +3,14 @@ using UnityEngine.UI;
 
 public class FighterHud : MonoBehaviour
 {
+    [SerializeField] private Fighter fighter;
     [SerializeField] private Image bodyFill;
     [SerializeField] private Image egoFill;
     [SerializeField] private Image shadowFill;
-    [SerializeField] private Image[] libidoPips;
+    [SerializeField] private Image[] libidoPips = new Image[0];
     [SerializeField] private CanvasGroup group;
     [SerializeField] private Transform head;
+    [SerializeField] private bool billboard;
     [SerializeField] private float showAngle = 0.55f;
     [SerializeField] private float fadeSpeed = 6f;
     [SerializeField] private float barSpeed = 3f;
@@ -18,12 +20,26 @@ public class FighterHud : MonoBehaviour
     private float body = 1f;
     private float ego = 1f;
     private float shadow;
-    private int libido = 10;
+
+    private void OnEnable()
+    {
+        if (fighter != null) fighter.Changed += Show;
+    }
+
+    private void OnDisable()
+    {
+        if (fighter != null) fighter.Changed -= Show;
+    }
 
     private void Start()
     {
         if (head == null && Camera.main != null) head = Camera.main.transform;
-        SetValues(body, ego, shadow, libido);
+        if (fighter != null) Show(fighter);
+    }
+
+    private void Show(Fighter f)
+    {
+        SetValues(f.BodyRatio, f.EgoRatio, f.ShadowRatio, f.Libido);
     }
 
     public void SetValues(float bodyValue, float egoValue, float shadowValue, int libidoValue)
@@ -31,17 +47,21 @@ public class FighterHud : MonoBehaviour
         body = Mathf.Clamp01(bodyValue);
         ego = Mathf.Clamp01(egoValue);
         shadow = Mathf.Clamp01(shadowValue);
-        libido = Mathf.Clamp(libidoValue, 0, libidoPips.Length);
-        for (int i = 0; i < libidoPips.Length; i++) libidoPips[i].color = i < libido ? pipOn : pipOff;
+        for (int i = 0; i < libidoPips.Length; i++) libidoPips[i].color = i < libidoValue ? pipOn : pipOff;
     }
 
     private void Update()
     {
         float step = Time.deltaTime * barSpeed;
-        bodyFill.fillAmount = Mathf.MoveTowards(bodyFill.fillAmount, body, step);
-        egoFill.fillAmount = Mathf.MoveTowards(egoFill.fillAmount, ego, step);
-        shadowFill.fillAmount = Mathf.MoveTowards(shadowFill.fillAmount, shadow, step);
+        if (bodyFill != null) bodyFill.fillAmount = Mathf.MoveTowards(bodyFill.fillAmount, body, step);
+        if (egoFill != null) egoFill.fillAmount = Mathf.MoveTowards(egoFill.fillAmount, ego, step);
+        if (shadowFill != null) shadowFill.fillAmount = Mathf.MoveTowards(shadowFill.fillAmount, shadow, step);
         if (head == null) return;
+        if (billboard)
+        {
+            transform.rotation = Quaternion.LookRotation(transform.position - head.position);
+            return;
+        }
         Vector3 toHead = (head.position - transform.position).normalized;
         bool facing = Vector3.Dot(-transform.forward, toHead) > showAngle;
         group.alpha = Mathf.MoveTowards(group.alpha, facing ? 1f : 0f, Time.deltaTime * fadeSpeed);
