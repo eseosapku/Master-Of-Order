@@ -10,11 +10,7 @@ public class ThrowableCard : MonoBehaviour
 {
     private enum CardState { Slot, Held, Flying, Spent }
 
-    [SerializeField] private float throwScale = 1.7f;
-    [SerializeField] private float gravity = 2.5f;
-    [SerializeField] private float minSpeed = 1.2f;
-    [SerializeField] private float maxLife = 3.5f;
-    [SerializeField] private float spin = 30f;
+    [SerializeField] private float throwScale = 1.7f, gravity = 2.5f, minSpeed = 1.2f, maxLife = 3.5f, spin = 30f;
     [SerializeField] private Renderer face;
     [SerializeField] private TMP_Text label;
     [SerializeField] private TrailRenderer trail;
@@ -24,6 +20,7 @@ public class ThrowableCard : MonoBehaviour
 
     public CardData Data { get; private set; }
     public bool Floating => state == CardState.Slot || state == CardState.Spent;
+    public Collider Hitbox => GetComponent<Collider>();
 
     private XRGrabInteractable grab;
     private Rigidbody rb;
@@ -31,11 +28,8 @@ public class ThrowableCard : MonoBehaviour
     private CardState state;
     private Vector3 lastPos;
     private Vector3 handVelocity;
-    private float life;
-    private float lastSpeed;
-    private float rechargeAt;
-    private float recharge;
-    private float assist;
+    private float life, lastSpeed, rechargeAt, recharge, assist;
+    private bool ready = true;
 
     private void Awake()
     {
@@ -60,6 +54,14 @@ public class ThrowableCard : MonoBehaviour
         face.sharedMaterials = mats;
         label.text = data.cardName + "  ·  " + data.cost;
         state = CardState.Slot;
+    }
+
+    public void SetReady(bool canPay)
+    {
+        if (canPay == ready || state != CardState.Slot) return;
+        ready = canPay;
+        grab.enabled = canPay;
+        faceMat.SetColor("_BaseColor", canPay ? Color.white : new Color(0.45f, 0.4f, 0.5f));
     }
 
     public void Hold(Vector3 pos, Quaternion rot, float follow)
@@ -109,8 +111,8 @@ public class ThrowableCard : MonoBehaviour
         if (state == CardState.Spent && Time.time >= rechargeAt)
         {
             state = CardState.Slot;
-            grab.enabled = true;
-            faceMat.SetColor("_BaseColor", Color.white);
+            ready = false;
+            SetReady(true);
         }
     }
 
