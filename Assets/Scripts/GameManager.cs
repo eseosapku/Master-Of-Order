@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private FloorState startState = FloorState.Menu;
     [SerializeField] private List<StateView> views = new List<StateView>();
     [SerializeField] private ArchiveDraft archive;
+    [SerializeField] private CardOrbit orbit;
     [SerializeField] private AudioSource clickSound;
 
     public event Action<FloorState> StateChanged;
@@ -119,6 +120,7 @@ public class GameManager : MonoBehaviour
     private void OnDraftDone(List<CardData> picked)
     {
         Orbit = new List<CardData>(picked);
+        if (orbit != null) orbit.Fill(Orbit);
         SetState(FloorState.Hall);
     }
 
