@@ -61,10 +61,8 @@ public class GameManager : MonoBehaviour
     public void SetState(FloorState next)
     {
         State = next;
-        foreach (StateView v in views)
-        {
-            if (v.view != null) v.view.SetActive(v.state == next);
-        }
+        foreach (StateView v in views) if (v.view != null && v.state != next) v.view.SetActive(false);
+        foreach (StateView v in views) if (v.view != null && v.state == next) v.view.SetActive(true);
         StateChanged?.Invoke(next);
     }
 
