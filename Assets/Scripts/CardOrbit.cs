@@ -8,6 +8,7 @@ public class CardOrbit : MonoBehaviour
     [SerializeField] private Material faceTemplate;
     [SerializeField] private Transform head;
     [SerializeField] private GameManager game;
+    [SerializeField] private Fighter owner;
     [SerializeField] private CardData[] starterDeck;
     [SerializeField] private float radius = 0.48f;
     [SerializeField] private float drop = 0.42f;
@@ -20,6 +21,7 @@ public class CardOrbit : MonoBehaviour
     public event Action<ThrowableCard> CardThrown;
 
     public IReadOnlyList<ThrowableCard> Cards => cards;
+    public Fighter Owner => owner;
 
     private readonly List<ThrowableCard> cards = new List<ThrowableCard>();
     private float yaw;
@@ -41,6 +43,8 @@ public class CardOrbit : MonoBehaviour
             c.Setup(d, faceTemplate, level, rechargeTime);
             c.Landed += OnLanded;
             c.Thrown += OnThrown;
+            if (owner != null) foreach (Collider oc in owner.GetComponentsInChildren<Collider>()) Physics.IgnoreCollision(c.Hitbox, oc);
+            foreach (ThrowableCard other in cards) Physics.IgnoreCollision(c.Hitbox, other.Hitbox);
             cards.Add(c);
         }
         Arrange(true);
@@ -82,6 +86,7 @@ public class CardOrbit : MonoBehaviour
             Quaternion around = Quaternion.Euler(0f, a, 0f);
             Vector3 pos = center + around * Vector3.forward * radius + Vector3.up * Mathf.Sin(t * 1.3f + i * 0.7f) * 0.015f;
             Quaternion rot = Quaternion.LookRotation(head.position - pos);
+            if (owner != null && Application.isPlaying) cards[i].SetReady(owner.Libido >= cards[i].Data.cost);
             if (snap) cards[i].transform.SetPositionAndRotation(pos, rot);
             else cards[i].Hold(pos, rot, follow);
         }
@@ -89,6 +94,7 @@ public class CardOrbit : MonoBehaviour
 
     private void OnThrown(ThrowableCard card)
     {
+        if (owner != null) owner.Spend(card.Data.cost);
         CardThrown?.Invoke(card);
     }
 
