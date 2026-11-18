@@ -39,7 +39,7 @@ public class FighterAI : MonoBehaviour
         }
     }
 
-    private bool Engaged => game == null || game.State == FloorState.Hall;
+    private bool Engaged => game == null || game.State == FloorState.Trial;
 
     private void Update()
     {
