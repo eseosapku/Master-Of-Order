@@ -35,19 +35,20 @@ public class CardOrbit : MonoBehaviour
     public void Fill(List<CardData> deck)
     {
         Clear();
-        float level = game != null ? game.AimAssist : 1f;
-        foreach (CardData d in deck)
-        {
-            ThrowableCard c = Instantiate(cardPrefab, transform);
-            c.name = "Orbit" + d.name;
-            c.Setup(d, faceTemplate, level, rechargeTime);
-            c.Landed += OnLanded;
-            c.Thrown += OnThrown;
-            if (owner != null) foreach (Collider oc in owner.GetComponentsInChildren<Collider>()) Physics.IgnoreCollision(c.Hitbox, oc);
-            foreach (ThrowableCard other in cards) Physics.IgnoreCollision(c.Hitbox, other.Hitbox);
-            cards.Add(c);
-        }
+        foreach (CardData d in deck) Add(d);
         Arrange(true);
+    }
+
+    public void Add(CardData d)
+    {
+        ThrowableCard c = Instantiate(cardPrefab, transform);
+        c.name = "Orbit" + d.name;
+        c.Setup(d, faceTemplate, game != null ? game.AimAssist : 1f, rechargeTime);
+        c.Landed += OnLanded;
+        c.Thrown += OnThrown;
+        if (owner != null) foreach (Collider oc in owner.GetComponentsInChildren<Collider>()) Physics.IgnoreCollision(c.Hitbox, oc);
+        foreach (ThrowableCard other in cards) Physics.IgnoreCollision(c.Hitbox, other.Hitbox);
+        cards.Add(c);
     }
 
     public void Clear()
