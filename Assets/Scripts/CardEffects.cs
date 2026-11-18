@@ -103,7 +103,7 @@ public class CardEffects : MonoBehaviour
     {
         Animator an = f.GetComponent<Animator>();
         if (an != null && an.runtimeAnimatorController != null) an.SetTrigger("Die");
-        StartCoroutine(Revive(f, an));
+        if (f.Team == 2) StartCoroutine(Revive(f, an));
     }
 
     private IEnumerator Revive(Fighter f, Animator an)
