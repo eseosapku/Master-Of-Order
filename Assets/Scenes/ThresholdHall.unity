@@ -5960,6 +5960,7 @@ GameObject:
   - component: {fileID: 263242583}
   - component: {fileID: 263242582}
   - component: {fileID: 263242580}
+  - component: {fileID: 263242585}
   m_Layer: 5
   m_Name: HandPanel
   m_TagString: Untagged
@@ -6060,6 +6061,7 @@ RectTransform:
   - {fileID: 1026474313}
   - {fileID: 549723215}
   - {fileID: 556060223}
+  - {fileID: 469417094}
   m_Father: {fileID: 1499506160}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -6133,6 +6135,33 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &263242585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 263242579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a2d7d89889b4d94fa1f8d6fe49788e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.UI.LazyFollow
+  m_Target: {fileID: 1743061230}
+  m_TargetOffset: {x: 0.48, y: -0.32, z: 0.5}
+  m_FollowInLocalSpace: 0
+  m_ApplyTargetInLocalSpace: 0
+  m_MovementSpeed: 4
+  m_MovementSpeedVariancePercentage: 0.25
+  m_SnapOnEnable: 1
+  m_PositionFollowMode: 1
+  m_MinDistanceAllowed: 0.55
+  m_MaxDistanceAllowed: 0.55
+  m_TimeUntilThresholdReachesMaxDistance: 3
+  m_RotationFollowMode: 1
+  m_MinAngleAllowed: 0.1
+  m_MaxAngleAllowed: 3
+  m_TimeUntilThresholdReachesMaxAngle: 3
 --- !u!1 &264044221
 GameObject:
   m_ObjectHideFlags: 0
@@ -11079,11 +11108,11 @@ Transform:
   m_GameObject: {fileID: 469417093}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.05, y: 1.1, z: 0.42}
+  m_LocalPosition: {x: -180, y: 0, z: -330}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1499506160}
+  m_Father: {fileID: 263242581}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &486237302
 GameObject:
@@ -42925,9 +42954,6 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 1717954561962503726, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 469417094}
     - targetCorrespondingSourceObject: {fileID: 1717954561962503726, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 263242581}

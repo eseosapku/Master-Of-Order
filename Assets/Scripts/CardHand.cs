@@ -102,7 +102,7 @@ public class CardHand : MonoBehaviour
 
     private IEnumerator Watch(ThrowableCard card)
     {
-        status.text = "Grab the card in front of you and throw it!";
+        status.text = "Your card is floating by this panel  ·  grab it and throw!";
         for (float t = 0f; card.Floating && t < throwWindow; t += Time.deltaTime) yield return null;
         for (float w = 0f; w < 3.5f && !card.Floating && !hit; w += Time.deltaTime) yield return null;
         yield return new WaitForSeconds(0.3f);
