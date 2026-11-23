@@ -83,6 +83,7 @@ public class CardHand : MonoBehaviour
     }
 
     private bool Ready(int i) => myTurn && rest[i] == 0 && owner.Libido >= board.Cost(deck[i], owner);
+    private bool Stuck => myTurn && !deck.Exists(c => Ready(deck.IndexOf(c)));
 
     private void Select(int i)
     {
@@ -99,6 +100,7 @@ public class CardHand : MonoBehaviour
 
     private void Play()
     {
+        if (Stuck) { myTurn = false; LastCard = null; Refresh(); CardResolved?.Invoke(null); return; }
         if (selected < 0 || selected >= deck.Count || !Ready(selected)) return;
         CardData c = deck[selected];
         rest[selected] = restTurns + 1;
@@ -137,8 +139,8 @@ public class CardHand : MonoBehaviour
             tiles[i].GetComponent<CanvasGroup>().alpha = rest[i] > 0 || owner.Libido < cost ? 0.4f : 1f;
         }
         bool can = selected >= 0 && selected < deck.Count && Ready(selected);
-        playButton.interactable = can;
-        playLabel.text = !myTurn ? "WAIT FOR YOUR TURN" : (selected < 0 ? "PICK A CARD" : (can ? "PLAY CARD" : "CAN'T PLAY"));
+        playButton.interactable = can || Stuck;
+        playLabel.text = !myTurn ? "WAIT FOR YOUR TURN" : Stuck ? "PASS TURN" : (selected < 0 ? "PICK A CARD" : (can ? "PLAY CARD" : "CAN'T PLAY"));
         status.text = myTurn ? "Your turn  ·  Libido " + owner.Libido + (owner.Has(StatusType.Shackled) ? "  ·  SHACKLED +3" : "") : "Opponent's turn";
     }
 }

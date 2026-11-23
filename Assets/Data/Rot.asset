@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Rot
   family: 8
   function: 1
+  kind: 0
   cost: 3
-  effect: 9
-  power: 5
-  duration: 3
-  description: For 8 s the target's healing hurts instead.
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 3
+  status: 2
+  guard: 0
+  trigger: 0
+  special: 0
+  description: For 3 turns, the rival cannot heal and poison hurts them twice as much.
   art: {fileID: 2800000, guid: eae6e939339b50049a51298ab8a1a699, type: 3}
   voice: {fileID: 8300000, guid: abebc81f487440747aa109c3a53a4981, type: 3}

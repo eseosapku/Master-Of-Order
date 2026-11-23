@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Rewind
   family: 0
   function: 0
+  kind: 0
   cost: 5
-  effect: 17
-  power: 3
-  duration: 3
-  description: Return your position and Body to 3 seconds ago. Libido stays spent.
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 18
+  description: Undo the Body and Ego you lost during the rival's last turn.
   art: {fileID: 2800000, guid: 100a9ee671c26c14290f5fd783faf5bd, type: 3}
   voice: {fileID: 8300000, guid: afd598010df88bd408b127c91507f9e5, type: 3}

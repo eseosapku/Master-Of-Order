@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Battery
   family: 16
   function: 3
+  kind: 1
   cost: 2
-  effect: 3
-  power: 2
-  duration: 3
-  description: Store Libido in this card; release it at +50%.
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 1
+  sap: 0
+  resolve: 10
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 0
+  description: Gain 1 extra Libido at the start of each of your turns. 10 Resolve.
   art: {fileID: 2800000, guid: be71d3d2bad2b394399a178be9e73e4f, type: 3}
   voice: {fileID: 8300000, guid: 52d539d2bab492049b5b97bafce0a679, type: 3}

@@ -13,12 +13,22 @@ MonoBehaviour:
   m_Name: Snare
   m_EditorClassIdentifier: Assembly-CSharp::CardData
   cardName: Snare
-  family: 9
+  family: 10
   function: 1
-  cost: 3
-  effect: 4
-  power: 3
-  duration: 3
-  description: A hidden trap roots whoever steps in for 3 s.
-  art: {fileID: 2800000, guid: b4c5d4bcf53785043b3734389efa02e1, type: 3}
+  kind: 2
+  cost: 2
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 2
+  special: 6
+  description: Hidden. The next field card the rival plays takes 15 damage as it lands.
+  art: {fileID: 2800000, guid: 3fe352ee6e6e2684baa9e7d8fad65fad, type: 3}
   voice: {fileID: 8300000, guid: 133cb2793148c4f4c9255a759eeb6dc4, type: 3}

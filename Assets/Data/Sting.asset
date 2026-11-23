@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Sting
   family: 8
   function: 1
+  kind: 0
   cost: 1
-  effect: 8
-  power: 4
-  duration: 3
-  description: Poison that ticks for 6 seconds.
+  damage: 6
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 3
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 0
+  description: 'Deal 6 damage and poison the rival: 4 damage at the start of each of their next 3 turns.'
   art: {fileID: 2800000, guid: eae6e939339b50049a51298ab8a1a699, type: 3}
   voice: {fileID: 8300000, guid: b0088af171ac46c458756109e0d66acb, type: 3}

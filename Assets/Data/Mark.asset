@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Mark
   family: 9
   function: 1
+  kind: 0
   cost: 1
-  effect: 9
-  power: 5
-  duration: 3
-  description: The marked target takes 20% more from all sources.
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 99
+  status: 1
+  guard: 0
+  trigger: 0
+  special: 0
+  description: Mark the rival. The next damage they take is 50 percent higher.
   art: {fileID: 2800000, guid: b4c5d4bcf53785043b3734389efa02e1, type: 3}
   voice: {fileID: 8300000, guid: aace107748e38b94089a731215543d26, type: 3}

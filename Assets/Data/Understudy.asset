@@ -13,12 +13,22 @@ MonoBehaviour:
   m_Name: Understudy
   m_EditorClassIdentifier: Assembly-CSharp::CardData
   cardName: Understudy
-  family: 14
-  function: 2
-  cost: 2
-  effect: 7
-  power: 1
-  duration: 8
-  description: Juno's card. Take the next hit meant for you, forever.
-  art: {fileID: 2800000, guid: 03f669967ae156d4ab5e4f65fc710f1c, type: 3}
+  family: 7
+  function: 3
+  kind: 1
+  cost: 0
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 40
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 1
+  trigger: 0
+  special: 0
+  description: Juno's card. A Guard with 40 Resolve that takes the hits meant for you.
+  art: {fileID: 2800000, guid: 2e6ef8917e843a94abd08986880d3e04, type: 3}
   voice: {fileID: 8300000, guid: ad7529530227c704f96edfe994da2320, type: 3}

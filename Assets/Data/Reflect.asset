@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Reflect
   family: 13
   function: 2
+  kind: 2
   cost: 3
-  effect: 11
-  power: 1
-  duration: 3
-  description: Bounce the next thrown attack back.
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 1
+  special: 12
+  description: Hidden. The next attack card played at you bounces back at the rival.
   art: {fileID: 2800000, guid: ae3e96b56ef26bc4bbc7747b5d3d993d, type: 3}
   voice: {fileID: 8300000, guid: 15c7ed3135a4e2c4da630347153ce750, type: 3}

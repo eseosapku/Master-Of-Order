@@ -13,12 +13,22 @@ MonoBehaviour:
   m_Name: Pierce
   m_EditorClassIdentifier: Assembly-CSharp::CardData
   cardName: Pierce
-  family: 5
+  family: 9
   function: 1
+  kind: 0
   cost: 3
-  effect: 0
-  power: 27
-  duration: 0
-  description: Passes straight through Ward cards.
-  art: {fileID: 2800000, guid: 8b8be9dae35036b4ba2fe744d78fcc06, type: 3}
+  damage: 16
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 1
+  description: Deal 16 damage straight past Guards, Decoys and Mirages.
+  art: {fileID: 2800000, guid: b4c5d4bcf53785043b3734389efa02e1, type: 3}
   voice: {fileID: 8300000, guid: f0f32cb6f0c1f13448fcfdb22aebc3c6, type: 3}

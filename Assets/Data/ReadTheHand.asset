@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Read the Hand
   family: 1
   function: 0
-  cost: 3
-  effect: 10
-  power: 5
-  duration: 3
-  description: Reveal 2 hidden enemy cards for the bout.
+  kind: 0
+  cost: 2
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 17
+  description: Reveal the rival's planned card and their Omens. If they play that card next anyway, it fizzles.
   art: {fileID: 2800000, guid: 78ae2a4d4d93216449a926603b5ec1cf, type: 3}
   voice: {fileID: 8300000, guid: bc3bbd63149c5b34a9c4f7aae71609c5, type: 3}

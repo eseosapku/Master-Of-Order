@@ -22,8 +22,8 @@ public class DuelAnnouncer : MonoBehaviour
     private void Awake() => fighters = FindObjectsByType<Fighter>(FindObjectsInactive.Include, FindObjectsSortMode.None);
     private void OnEnable() => Listen(true);
     private void OnDisable() => Listen(false);
-    private void OnNote(string s) => notes.Add(s);
-    private void OnFighterNote(Fighter f, string s) => notes.Add(s);
+    private void OnNote(string s) => notes.Add(s.Replace("You's", "Your").Replace("You rewinds", "You rewind"));
+    private void OnFighterNote(Fighter f, string s) => OnNote(s.Replace("You rises", "You rise"));
     private void OnBoutEnded(int index, bool won) => Say(won ? victoryClip : defeatClip);
 
     private void Listen(bool on)
@@ -94,7 +94,7 @@ public class DuelAnnouncer : MonoBehaviour
     private void OnTurnResolved(Fighter f, CardData card, Fighter foe, float body, float ego, float foeBody, float foeEgo)
     {
         bool me = f == trials.Player;
-        string title = (me ? "YOU PLAYED " : f.DisplayName.ToUpper() + " PLAYED ") + (card.kind == CardKind.Omen && !me ? "A HIDDEN OMEN" : card.cardName.ToUpper());
+        string title = card == null ? (me ? "YOU PASS" : f.DisplayName.ToUpper() + " PASSES") : (me ? "YOU PLAYED " : f.DisplayName.ToUpper() + " PLAYED ") + (card.kind == CardKind.Omen && !me ? "A HIDDEN OMEN" : card.cardName.ToUpper());
         string result = (Delta(foe, foeBody, foeEgo) + "   " + Delta(f, body, ego)).Trim();
         string extra = TakeNotes();
         bool missed = extra.Contains("miss") || extra.Contains("passes through") || extra.Contains("fizzles") || extra.Contains("cancelled");

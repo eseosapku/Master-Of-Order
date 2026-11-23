@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Long Echo
   family: 2
   function: 0
-  cost: 4
-  effect: 0
-  power: 30
-  duration: 0
-  description: Damage dealt this round repeats next round.
+  kind: 2
+  cost: 3
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 2
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 21
+  description: Hidden. In 2 turns, your last Instant card plays again for free.
   art: {fileID: 2800000, guid: 531b03ae690d5c649b96ae39f37e885a, type: 3}
   voice: {fileID: 8300000, guid: dd262f71f42d9c84fb473aea942e3ba0, type: 3}

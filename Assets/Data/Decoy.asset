@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Decoy
   family: 4
   function: 0
+  kind: 1
   cost: 2
-  effect: 15
-  power: 4
-  duration: 3
-  description: Spawn a fake you that draws attacks.
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 12
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 1
+  trigger: 0
+  special: 22
+  description: A Guard with 12 Resolve. Each attack on it has a 50 percent chance to pass through harmlessly.
   art: {fileID: 2800000, guid: b8df90b682674db47940f46bdc8591ae, type: 3}
   voice: {fileID: 8300000, guid: 20da21d1df6be784f90c682d8afc350a, type: 3}

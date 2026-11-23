@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Mirage Field
   family: 4
   function: 0
+  kind: 1
   cost: 4
-  effect: 15
-  power: 4
-  duration: 3
-  description: Your last card appears three times; one is real.
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 15
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 23
+  description: While it stands, each rival attack has a 30 percent chance to miss. 15 Resolve.
   art: {fileID: 2800000, guid: b8df90b682674db47940f46bdc8591ae, type: 3}
   voice: {fileID: 8300000, guid: 4cd8a328b05988e489d9b90bc09d062d, type: 3}

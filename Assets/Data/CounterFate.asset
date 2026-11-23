@@ -12,13 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cff472a75033ad4380bb934c4d375f3, type: 3}
   m_Name: CounterFate
   m_EditorClassIdentifier: Assembly-CSharp::CardData
-  cardName: Counter-Fate
+  cardName: Counter Fate
   family: 1
   function: 0
+  kind: 2
   cost: 4
-  effect: 11
-  power: 1
-  duration: 3
-  description: Pre-load a card that fires when you are next hit.
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 3
+  special: 20
+  description: Hidden. The next attack card played at you is cancelled.
   art: {fileID: 2800000, guid: 78ae2a4d4d93216449a926603b5ec1cf, type: 3}
   voice: {fileID: 8300000, guid: bf4fecf734ee70f4491a60ccd53981f8, type: 3}

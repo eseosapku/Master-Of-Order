@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Intimidate
   family: 19
   function: 3
-  cost: 1
-  effect: 9
-  power: 5
-  duration: 3
-  description: Push the enemy back 3 metres.
+  kind: 0
+  cost: 2
+  damage: 0
+  ego: 15
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 0
+  description: Deal 15 Ego damage. At 0 Ego the rival breaks and loses a turn.
   art: {fileID: 2800000, guid: 8552e4a4d78c97440b49b3982978aa18, type: 3}
   voice: {fileID: 8300000, guid: 65485d7ed2e30d74faa8e5ea038555c2, type: 3}

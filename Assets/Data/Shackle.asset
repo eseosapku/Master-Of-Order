@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Shackle
   family: 10
   function: 2
+  kind: 0
   cost: 3
-  effect: 13
-  power: 3
-  duration: 3
-  description: Lock one of the enemy's throwing hands.
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 99
+  status: 3
+  guard: 0
+  trigger: 0
+  special: 0
+  description: The rival's next card costs 3 more Libido.
   art: {fileID: 2800000, guid: 3fe352ee6e6e2684baa9e7d8fad65fad, type: 3}
   voice: {fileID: 8300000, guid: 169ee6c5826124942b52874f88aa7ca5, type: 3}

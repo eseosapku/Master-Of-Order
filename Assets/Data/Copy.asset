@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Copy
   family: 14
   function: 2
+  kind: 0
   cost: 3
-  effect: 12
-  power: 1
-  duration: 3
-  description: Copy the enemy's last card.
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 11
+  description: Play a copy of the last card the rival played, as your own.
   art: {fileID: 2800000, guid: 03f669967ae156d4ab5e4f65fc710f1c, type: 3}
   voice: {fileID: 8300000, guid: 00d596a94b7370d4f95e9965d7d94b95, type: 3}

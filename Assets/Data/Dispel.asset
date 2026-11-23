@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Dispel
   family: 12
   function: 2
+  kind: 0
   cost: 2
-  effect: 14
-  power: 1
-  duration: 3
-  description: End one active enemy effect.
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 10
+  description: Destroy a rival field card with 15 Resolve or less. If there is none, wipe all of the rival's effects.
   art: {fileID: 2800000, guid: a184c884bed23924c8cd120004194820, type: 3}
   voice: {fileID: 8300000, guid: 1dca5295dd526eb429673645da5e1b4d, type: 3}

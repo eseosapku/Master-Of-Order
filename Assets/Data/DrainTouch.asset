@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Drain Touch
   family: 15
   function: 3
-  cost: 2
-  effect: 2
-  power: 12
-  duration: 3
-  description: Heal for 50% of the damage dealt.
+  kind: 0
+  cost: 3
+  damage: 12
+  ego: 0
+  heal: 6
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 0
+  description: Deal 12 damage and heal 6 Body.
   art: {fileID: 2800000, guid: 6b45a14013720ee4fab4ccde74c96de9, type: 3}
   voice: {fileID: 8300000, guid: d10625c70a3ed6a42a33d3fc6e38ec90, type: 3}

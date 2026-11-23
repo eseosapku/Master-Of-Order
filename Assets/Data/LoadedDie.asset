@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Loaded Die
   family: 3
   function: 0
+  kind: 1
   cost: 3
-  effect: 19
-  power: 1
-  duration: 3
-  description: The next random effect goes your way.
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 12
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 24
+  description: 'At the start of each of your turns, roll a die: 1 to 3 deals 4, 4 or 5 deals 8, a 6 deals 16. 12 Resolve.'
   art: {fileID: 2800000, guid: 4ea6e661d82ec8044be0994c99c9db68, type: 3}
   voice: {fileID: 8300000, guid: d525f20ecd22b394bb52e2a4d1daf763, type: 3}

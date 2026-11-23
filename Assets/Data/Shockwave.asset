@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Shockwave
   family: 5
   function: 1
-  cost: 3
-  effect: 0
-  power: 27
-  duration: 0
-  description: A ring that knocks everyone back.
+  kind: 0
+  cost: 4
+  damage: 10
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 2
+  description: Deal 10 damage to the rival and 10 to each of their field cards. Ignores Guards.
   art: {fileID: 2800000, guid: 8b8be9dae35036b4ba2fe744d78fcc06, type: 3}
   voice: {fileID: 8300000, guid: 3da790546970e4d4ab2e2344150b58d5, type: 3}

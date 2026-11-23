@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Regrow
   family: 18
   function: 3
+  kind: 1
   cost: 3
-  effect: 1
-  power: 15
-  duration: 3
-  description: Heal 40 Body over 8 seconds.
+  damage: 0
+  ego: 0
+  heal: 6
+  libido: 0
+  sap: 0
+  resolve: 15
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 0
+  description: Heal 6 Body at the start of each of your turns. 15 Resolve.
   art: {fileID: 2800000, guid: 580520b79f858334a9e0ea15c6bbe2d2, type: 3}
   voice: {fileID: 8300000, guid: 1ae9efce2be6cd240a00007bcd23e1e5, type: 3}

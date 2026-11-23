@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Panic
   family: 19
   function: 3
+  kind: 0
   cost: 3
-  effect: 9
-  power: 5
-  duration: 3
-  description: Shuffle the enemy's Orbit so they grab the wrong card.
+  damage: 0
+  ego: 10
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 99
+  status: 5
+  guard: 0
+  trigger: 0
+  special: 0
+  description: Deal 10 Ego damage. The rival's next card has a 30 percent chance to fizzle.
   art: {fileID: 2800000, guid: 8552e4a4d78c97440b49b3982978aa18, type: 3}
   voice: {fileID: 8300000, guid: 900cb0d04e26ade47ba0f235b1c7c909, type: 3}

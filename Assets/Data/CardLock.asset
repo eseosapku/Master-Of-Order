@@ -15,10 +15,20 @@ MonoBehaviour:
   cardName: Card Lock
   family: 12
   function: 2
+  kind: 0
   cost: 3
-  effect: 13
-  power: 3
-  duration: 3
-  description: Seal one visible Orbit card for 2 rounds.
+  damage: 0
+  ego: 0
+  heal: 0
+  libido: 0
+  sap: 0
+  resolve: 0
+  turns: 0
+  statusTurns: 0
+  status: 0
+  guard: 0
+  trigger: 0
+  special: 8
+  description: Lock the last card the rival played. It rests 2 extra turns.
   art: {fileID: 2800000, guid: a184c884bed23924c8cd120004194820, type: 3}
   voice: {fileID: 8300000, guid: f04958158e5f5ac4f878a305025be85a, type: 3}
