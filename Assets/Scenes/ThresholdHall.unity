@@ -5960,7 +5960,6 @@ GameObject:
   - component: {fileID: 263242583}
   - component: {fileID: 263242582}
   - component: {fileID: 263242580}
-  - component: {fileID: 263242585}
   m_Layer: 5
   m_Name: HandPanel
   m_TagString: Untagged
@@ -6018,6 +6017,11 @@ MonoBehaviour:
   voice: {fileID: 556060222}
   restTurns: 2
   throwWindow: 20
+  head: {fileID: 1743061230}
+  sideAngle: 48
+  distance: 0.62
+  drop: 0.12
+  turnLimit: 70
   functionColors:
   - {r: 0.7, g: 0.5, b: 1, a: 1}
   - {r: 1, g: 0.55, b: 0.3, a: 1}
@@ -6135,33 +6139,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!114 &263242585
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 263242579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a2d7d89889b4d94fa1f8d6fe49788e8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.XR.Interaction.Toolkit::UnityEngine.XR.Interaction.Toolkit.UI.LazyFollow
-  m_Target: {fileID: 1743061230}
-  m_TargetOffset: {x: 0.48, y: -0.32, z: 0.5}
-  m_FollowInLocalSpace: 0
-  m_ApplyTargetInLocalSpace: 0
-  m_MovementSpeed: 4
-  m_MovementSpeedVariancePercentage: 0.25
-  m_SnapOnEnable: 1
-  m_PositionFollowMode: 1
-  m_MinDistanceAllowed: 0.55
-  m_MaxDistanceAllowed: 0.55
-  m_TimeUntilThresholdReachesMaxDistance: 3
-  m_RotationFollowMode: 1
-  m_MinAngleAllowed: 0.1
-  m_MaxAngleAllowed: 3
-  m_TimeUntilThresholdReachesMaxAngle: 3
 --- !u!1 &264044221
 GameObject:
   m_ObjectHideFlags: 0

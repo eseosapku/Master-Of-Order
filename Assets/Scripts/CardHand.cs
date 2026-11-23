@@ -20,6 +20,8 @@ public class CardHand : MonoBehaviour
     [SerializeField] private AudioSource voice;
     [SerializeField] private int restTurns = 2;
     [SerializeField] private float throwWindow = 20f;
+    [SerializeField] private Transform head;
+    [SerializeField] private float sideAngle = 48f, distance = 0.62f, drop = 0.12f, turnLimit = 70f;
     [SerializeField] private Color[] functionColors = { new Color(0.7f, 0.5f, 1f), new Color(1f, 0.55f, 0.3f), new Color(0.4f, 0.75f, 1f), new Color(0.4f, 1f, 0.65f) };
 
     public event Action<ThrowableCard, Collider, float> CardLanded;
@@ -33,24 +35,26 @@ public class CardHand : MonoBehaviour
     private readonly List<int> rest = new List<int>();
     private int selected = -1;
     private bool myTurn, hit;
+    private float yaw = float.NaN, goal = float.NaN;
 
     private void Awake()
     {
-        for (int i = 0; i < tiles.Length; i++)
-        {
-            int slot = i;
-            tiles[i].onClick.AddListener(() => Select(slot));
-        }
+        for (int i = 0; i < tiles.Length; i++) { int slot = i; tiles[i].onClick.AddListener(() => Select(slot)); }
         playButton.onClick.AddListener(Play);
         if (deck.Count == 0 && starterDeck != null) Fill(new List<CardData>(starterDeck));
     }
 
-    public void Fill(List<CardData> cards)
+    private void LateUpdate()
     {
-        deck.Clear();
-        rest.Clear();
-        foreach (CardData c in cards) Add(c);
+        if (head == null) return;
+        float look = head.eulerAngles.y;
+        if (float.IsNaN(goal) || Mathf.Abs(Mathf.DeltaAngle(look, goal)) > sideAngle + turnLimit) goal = look + sideAngle;
+        yaw = float.IsNaN(yaw) ? goal : Mathf.LerpAngle(yaw, goal, Time.deltaTime * 4f);
+        Vector3 at = head.position + Quaternion.Euler(0f, yaw, 0f) * Vector3.forward * distance + Vector3.down * drop;
+        transform.SetPositionAndRotation(at, Quaternion.LookRotation(at - head.position));
     }
+
+    public void Fill(List<CardData> cards) { deck.Clear(); rest.Clear(); foreach (CardData c in cards) Add(c); }
 
     public void Add(CardData c)
     {
