@@ -34,4 +34,5 @@ public class CardData : ScriptableObject
     public float duration;
     [TextArea] public string description;
     public Texture2D art;
+    public AudioClip voice;
 }

@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,9 +9,14 @@ public class FighterHud : MonoBehaviour
     [SerializeField] private Image egoFill;
     [SerializeField] private Image shadowFill;
     [SerializeField] private Image[] libidoPips = new Image[0];
+    [SerializeField] private TMP_Text nameText;
+    [SerializeField] private TMP_Text bodyText;
+    [SerializeField] private TMP_Text egoText;
+    [SerializeField] private TMP_Text libidoText;
     [SerializeField] private CanvasGroup group;
     [SerializeField] private Transform head;
     [SerializeField] private bool billboard;
+    [SerializeField] private bool alwaysShow;
     [SerializeField] private float showAngle = 0.55f;
     [SerializeField] private float fadeSpeed = 6f;
     [SerializeField] private float barSpeed = 3f;
@@ -37,9 +43,22 @@ public class FighterHud : MonoBehaviour
         if (fighter != null) Show(fighter);
     }
 
+    public void Bind(Fighter f)
+    {
+        if (fighter != null) fighter.Changed -= Show;
+        fighter = f;
+        if (fighter == null) return;
+        fighter.Changed += Show;
+        Show(fighter);
+    }
+
     private void Show(Fighter f)
     {
         SetValues(f.BodyRatio, f.EgoRatio, f.ShadowRatio, f.Libido);
+        if (nameText != null) nameText.text = f.DisplayName.ToUpper();
+        if (bodyText != null) bodyText.text = "BODY  " + Mathf.CeilToInt(f.Body);
+        if (egoText != null) egoText.text = "EGO  " + Mathf.CeilToInt(f.Ego);
+        if (libidoText != null) libidoText.text = "LIBIDO  " + f.Libido;
     }
 
     public void SetValues(float bodyValue, float egoValue, float shadowValue, int libidoValue)
@@ -56,7 +75,7 @@ public class FighterHud : MonoBehaviour
         if (bodyFill != null) bodyFill.fillAmount = Mathf.MoveTowards(bodyFill.fillAmount, body, step);
         if (egoFill != null) egoFill.fillAmount = Mathf.MoveTowards(egoFill.fillAmount, ego, step);
         if (shadowFill != null) shadowFill.fillAmount = Mathf.MoveTowards(shadowFill.fillAmount, shadow, step);
-        if (head == null) return;
+        if (head == null || alwaysShow) return;
         if (billboard)
         {
             transform.rotation = Quaternion.LookRotation(transform.position - head.position);

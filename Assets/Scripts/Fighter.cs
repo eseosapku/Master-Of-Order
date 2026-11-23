@@ -40,7 +40,7 @@ public class Fighter : MonoBehaviour
     public List<StatusEffect> Statuses { get; } = new List<StatusEffect>();
 
     private float libido;
-
+    public static bool Paused;
     private void Awake() => Restore();
 
     public void Restore()
@@ -134,7 +134,7 @@ public class Fighter : MonoBehaviour
 
     private void Update()
     {
-        if (IsDown) return;
+        if (IsDown || Paused) return;
         int before = Libido;
         if (!Has(StatusType.Frozen)) libido = Mathf.Min(maxLibido, libido + libidoPerSecond * Time.deltaTime);
         int count = Statuses.Count;
