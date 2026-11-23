@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FighterAI : MonoBehaviour
+public class FighterAI : MonoBehaviour, ISatchel
 {
     [SerializeField] private Fighter fighter;
     [SerializeField] private Animator animator;
@@ -12,35 +12,55 @@ public class FighterAI : MonoBehaviour
     [SerializeField] private Texture cardBack;
     [SerializeField] private CardData[] deck;
     [SerializeField] private int restTurns = 2;
-    [SerializeField] private float windup = 0.42f, turnSpeed = 6f, fieldScale = 3.2f, noise = 5f;
+    [SerializeField] private float release = 0.38f, turnSpeed = 6f, fieldScale = 3.2f, noise = 5f;
 
     public CardData Intent { get; private set; }
 
-    private readonly Dictionary<CardData, int> rest = new Dictionary<CardData, int>();
-    private Transform hand;
+    private readonly List<CardData> hand = new List<CardData>();
+    private readonly List<int> rest = new List<int>();
+    private Transform bone;
     private Fighter facing;
 
     private void Start()
     {
-        hand = animator.GetBoneTransform(HumanBodyBones.RightHand);
+        bone = animator.GetBoneTransform(HumanBodyBones.RightHand);
         animator.SetBool("Showcase", false);
         animator.SetInteger("Mood", 3);
     }
 
-    private void OnEnable() => board.RestAdded += OnRest;
-    private void OnDisable() => board.RestAdded -= OnRest;
-    private void OnRest(Fighter f, CardData c, int turns) { if (f == fighter) rest[c] = Rest(c) + turns; }
-    private int Rest(CardData c) => rest.TryGetValue(c, out int r) ? r : 0;
-
     public void Face(Fighter target) => facing = target;
-    public bool Ready(CardData c) => c != null && Rest(c) == 0 && board.Cost(c, fighter) <= fighter.Libido && !board.Foreseen(fighter, c);
-    public void Prepare(Fighter foe) { Face(foe); rest.Clear(); Plan(foe); }
     public void Plan(Fighter foe) => Intent = Choose(foe);
+    private bool Ready(int i) => i >= 0 && rest[i] == 0 && board.Cost(hand[i], fighter) <= fighter.Libido;
+
+    public void Prepare(Fighter foe)
+    {
+        Face(foe);
+        hand.Clear();
+        rest.Clear();
+        foreach (CardData c in deck) Give(c);
+        board.Register(fighter, this);
+        Plan(foe);
+    }
+
+    public void Seal(CardData c, int turns) { for (int i = 0; i < hand.Count; i++) if (hand[i] == c) rest[i] += turns; }
+    public void SealRandom() { if (hand.Count > 0) rest[Random.Range(0, hand.Count)] = 99; }
+    public void Unseal() { for (int i = 0; i < rest.Count; i++) rest[i] = 0; }
+    public void Give(CardData c) { hand.Add(c); rest.Add(0); }
+
+    public CardData Take()
+    {
+        if (hand.Count == 0) return null;
+        int i = Random.Range(0, hand.Count);
+        CardData c = hand[i];
+        hand.RemoveAt(i);
+        rest.RemoveAt(i);
+        return c;
+    }
 
     public CardData Pick(Fighter foe)
     {
-        foreach (CardData c in new List<CardData>(rest.Keys)) rest[c] = Mathf.Max(0, rest[c] - 1);
-        return Ready(Intent) ? Intent : Choose(foe);
+        for (int i = 0; i < rest.Count; i++) rest[i] = Mathf.Max(0, rest[i] - 1);
+        return Ready(hand.IndexOf(Intent)) ? Intent : Choose(foe);
     }
 
     private void Update()
@@ -55,48 +75,56 @@ public class FighterAI : MonoBehaviour
     {
         CardData best = null;
         float top = float.MinValue;
-        foreach (CardData c in deck)
+        for (int i = 0; i < hand.Count; i++)
         {
-            if (!Ready(c)) continue;
-            float s = Value(c, foe) - c.cost * 1.5f + Random.Range(0f, noise);
-            if (s > top) { top = s; best = c; }
+            if (!Ready(i)) continue;
+            float s = Value(hand[i], foe) - hand[i].cost * 1.5f + Random.Range(0f, noise);
+            if (s > top) { top = s; best = hand[i]; }
         }
         return best;
     }
 
     private float Value(CardData c, Fighter foe)
     {
-        float v = c.damage + c.ego * 0.6f + c.sap * 3f + (c.status == StatusType.Skip ? 14f : 6f) * Mathf.Min(c.statusTurns, 3) + c.libido * 3f + c.heal * (1f - fighter.BodyRatio) * 2.2f;
-        bool foeGuarded = board.Guard(foe) != null;
-        if (c.kind == CardKind.Field) v = v * 3f + c.resolve * 0.4f + (c.guard ? (board.Guard(fighter) == null ? 14f : -12f) : 4f);
-        if (c.kind == CardKind.Omen) v = c.trigger == OmenTrigger.Countdown ? v * 0.9f : 10f;
-        if (c.statusTurns > 0 && foe.Has(c.status)) v -= 20f;
+        bool guarded = board.Guard(foe) != null, mine = board.Units.Exists(u => u.owner == fighter && u.card == c);
+        float v = c.damage * (guarded && c.special != Special.Pierce ? 0.5f : 1f) + c.heal * (1f - fighter.BodyRatio) * 2.5f;
         switch (c.special)
         {
-            case Special.Pierce: case Special.Shockwave: if (foeGuarded) v += 12f; break;
-            case Special.Charged: if (fighter.Libido - c.cost >= 5) v += 10f; break;
-            case Special.Copy: v += 7f; break;
-            case Special.Rewind: v += fighter.BodyRatio < 0.5f ? 15f : -10f; break;
-            case Special.CoinToss: v += 6f; break;
-            case Special.Dispel: v += board.Units.Exists(u => u.owner == foe && u.card.kind == CardKind.Field && u.resolve <= 15) ? 15f : -20f; break;
-            case Special.Glimpse: case Special.ReadHand: v += board.Units.Exists(u => u.owner == foe && !u.revealed) ? 12f : -10f; break;
-            case Special.Phoenix: v += fighter.BodyRatio < 0.4f ? 20f : -5f; break;
+            case Special.None: if (c.guard) v += board.Guard(fighter) == null ? 18f : -12f; if (c.statusTurns > 0) v += foe.Has(c.status) ? -15f : 8f; break;
+            case Special.Pierce: if (guarded) v += 10f; break;
+            case Special.Shatter: v = board.Units.Exists(u => u.owner == foe) ? 24f : -20f; break;
+            case Special.Gamble: v = 8f; break;
+            case Special.Mirror: case Special.Negate: v = mine ? -10f : 11f; break;
+            case Special.Cleanse: v = fighter.Statuses.Count > 0 || rest.Exists(r => r > 2) ? 12f : -15f; break;
+            case Special.Erosion: case Special.LoadedDie: v = mine ? -5f : 15f; break;
+            case Special.Stillframe: v = 9f; break;
+            case Special.Glimpse: v = board.HasHidden(foe) ? 12f : 1f; break;
+            case Special.Double: v = fighter.Has(StatusType.Doubled) ? -10f : 7f; break;
+            case Special.Thief: v = 6f; break;
+            case Special.Seal: case Special.Echo: v = 7f; break;
         }
+        if (c.special == Special.None && c.kind == CardKind.Field && c.heal > 0) v = mine ? -5f : 10f + (1f - fighter.BodyRatio) * 10f;
         return v;
     }
 
     public IEnumerator Play(CardData c, Fighter foe)
     {
-        rest[c] = restTurns + 1;
+        int i = hand.IndexOf(c);
+        if (i >= 0) rest[i] = restTurns + 1;
         Face(foe);
-        animator.SetTrigger(c.kind == CardKind.Instant && c.Offensive ? "Throw" : "Cast");
-        yield return new WaitForSeconds(windup);
-        Vector3 from = hand != null ? hand.position : transform.position + Vector3.up * 1.4f;
-        ThrowableCard card = Instantiate(cardPrefab, from, transform.rotation);
-        card.Setup(c, faceTemplate, c.kind == CardKind.Omen ? cardBack : c.art);
-        if (c.kind == CardKind.Omen) card.Show(cardBack, "HIDDEN OMEN");
-        yield return card.Fly(board.Aim(c, fighter, foe), c.kind == CardKind.Instant ? 1f : fieldScale, foe.transform);
+        animator.SetTrigger("Throw");
+        ThrowableCard card = Instantiate(cardPrefab, bone != null ? bone.position : transform.position + Vector3.up * 1.4f, transform.rotation);
+        bool hidden = c.kind == CardKind.Hidden;
+        card.Setup(c, faceTemplate, hidden ? cardBack : c.art);
+        if (hidden) card.Show(cardBack, "HIDDEN CARD");
+        for (float t = 0f; t < release; t += Time.deltaTime)
+        {
+            if (bone != null) card.transform.SetPositionAndRotation(bone.position, bone.rotation);
+            yield return null;
+        }
+        yield return card.Fly(board.Aim(c, fighter, foe), c.kind == CardKind.Instant ? 1f : fieldScale, foe.transform, false);
         Destroy(card.gameObject);
-        board.Play(c, fighter, foe);
+        yield return board.Play(c, fighter, foe);
+        Plan(foe);
     }
 }

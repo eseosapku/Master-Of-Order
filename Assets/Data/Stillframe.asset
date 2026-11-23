@@ -14,21 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardData
   cardName: Stillframe
   family: 0
-  function: 0
+  function: 2
   kind: 0
-  cost: 4
+  cost: 3
   damage: 0
-  ego: 0
   heal: 0
-  libido: 0
-  sap: 0
   resolve: 0
-  turns: 0
-  statusTurns: 1
-  status: 4
+  statusTurns: 0
   guard: 0
-  trigger: 0
-  special: 0
-  description: Freeze the rival. They lose their next turn.
+  status: 0
+  special: 9
+  description: 'Call the coin. Right: the rival loses their next turn. Wrong: you lose yours. Countered by Negate.'
   art: {fileID: 2800000, guid: 100a9ee671c26c14290f5fd783faf5bd, type: 3}
-  voice: {fileID: 8300000, guid: c539268a34ce3f44dbc92cdd465392ef, type: 3}
+  voice: {fileID: 0}

@@ -40,6 +40,7 @@ public class CutFloor : MonoBehaviour
     private void OnBout(int trial, bool won)
     {
         foreach (Fighter f in won ? trials.SideB : trials.SideA) Collapse(f);
+        foreach (Fighter f in won ? trials.SideA : trials.SideB) { Animator an = f.GetComponent<Animator>(); if (an != null && an.runtimeAnimatorController != null) an.SetTrigger("Cheer"); }
     }
 
     private void OnRound(int round)
@@ -47,7 +48,7 @@ public class CutFloor : MonoBehaviour
         if (round != 1) return;
         foreach (KeyValuePair<Fighter, Vector3> h in homes)
         {
-            if (h.Key.Team == 0 && h.Key.GetComponentInChildren<Camera>() == null && trials.SideA.Length < 2) continue;
+            if (System.Array.IndexOf(trials.SideA, h.Key) < 0 && System.Array.IndexOf(trials.SideB, h.Key) < 0) continue;
             h.Key.transform.position = h.Value;
             h.Key.gameObject.SetActive(true);
         }

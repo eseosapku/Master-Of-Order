@@ -14,21 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardData
   cardName: Bastion
   family: 7
-  function: 1
+  function: 3
   kind: 1
-  cost: 4
+  cost: 2
   damage: 0
-  ego: 0
   heal: 0
-  libido: 0
-  sap: 0
-  resolve: 30
-  turns: 0
+  resolve: 40
   statusTurns: 0
-  status: 0
   guard: 1
-  trigger: 0
+  status: 0
   special: 0
-  description: A Guard with 30 Resolve. Attacks must break it before they can reach you.
+  description: A Guard that soaks 40 damage before any reaches you. Countered by Pierce and Shatter.
   art: {fileID: 2800000, guid: 2e6ef8917e843a94abd08986880d3e04, type: 3}
   voice: {fileID: 8300000, guid: b76c9adb0893ec1419f194da29a31606, type: 3}

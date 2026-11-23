@@ -18,17 +18,12 @@ MonoBehaviour:
   kind: 0
   cost: 1
   damage: 0
-  ego: 0
   heal: 0
-  libido: 0
-  sap: 0
   resolve: 0
-  turns: 0
   statusTurns: 0
-  status: 0
   guard: 0
-  trigger: 0
-  special: 16
-  description: Reveal the rival's next planned card and turn their hidden Omens face up.
+  status: 0
+  special: 10
+  description: See the rival's planned card and turn their hidden cards face up.
   art: {fileID: 2800000, guid: 78ae2a4d4d93216449a926603b5ec1cf, type: 3}
   voice: {fileID: 8300000, guid: 40dba29c9c94855459339c196f985aaf, type: 3}

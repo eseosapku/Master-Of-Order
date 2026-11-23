@@ -13,15 +13,15 @@ public class TrialManager : MonoBehaviour
     [SerializeField] private Board board;
     [SerializeField] private Transform rivalSpot;
     [SerializeField] private int libidoPerTurn = 3;
-    [SerializeField] private float resolveTime = 1.2f, readTime = 3.4f, resultTime = 5f;
+    [SerializeField] private float resolveTime = 1.2f, readTime = 1.8f, resultTime = 4f;
 
     public event Action<string, string> Message;
     public event Action<Fighter, int> BoutStarted;
     public event Action<Fighter, bool> TurnStarted;
-    public event Action<Fighter, CardData> CardAnnounced;
-    public event Action<Fighter, CardData, Fighter, float, float, float, float> TurnResolved;
+    public event Action<Fighter, CardData, Fighter, float, float> TurnResolved;
     public event Action<int> RoundStarted;
     public event Action<int, bool> BoutEnded;
+    public event Action ChoiceMade;
 
     public TrialPhase Phase { get; private set; }
     public int TrialIndex { get; private set; }
@@ -29,13 +29,16 @@ public class TrialManager : MonoBehaviour
     public Fighter Player => player;
     public Fighter[] SideA { get; private set; } = new Fighter[0];
     public Fighter[] SideB { get; private set; } = new Fighter[0];
-
     private Coroutine running;
     private bool lastWin, resolved;
+    private int choice = -1;
+    private CardData played;
 
     private void OnEnable() { game.StateChanged += OnState; hand.CardResolved += OnResolved; }
     private void OnDisable() { game.StateChanged -= OnState; hand.CardResolved -= OnResolved; }
-    private void OnResolved(CardData c) => resolved = true;
+    private void OnResolved(CardData c) { resolved = true; played = c; }
+    public void Choose(int option) { choice = option; ChoiceMade?.Invoke(); }
+    public void StartDuel(Fighter traitor) => running = StartCoroutine(Duel(traitor));
 
     private void OnState(FloorState s)
     {
@@ -54,43 +57,52 @@ public class TrialManager : MonoBehaviour
         Phase = TrialPhase.Prepare;
         for (TrialIndex = 1; TrialIndex <= rivals.Length; TrialIndex++)
         {
-            yield return Bout(rivals[TrialIndex - 1]);
-            if (!lastWin) { yield return Fail("The floor gives way. Draft again."); yield break; }
-            yield return Show("DUEL WON", TrialIndex + " of " + rivals.Length + " opponents defeated", resultTime);
+            yield return Fight(rivals[TrialIndex - 1]);
+            if (!lastWin) yield break;
         }
         Message?.Invoke("THE FINAL CUT", "One face per pair ascends.");
         Finish(FloorState.Cut);
     }
 
-    public void StartDuel(Fighter traitor) => running = StartCoroutine(Duel(traitor));
-
     private IEnumerator Duel(Fighter traitor)
     {
-        yield return Show("JUNO PLAYS STEAL", "She was never climbing with you.", resultTime);
+        yield return Show("JUNO TURNS ON YOU", "She was never climbing with you.", resultTime);
         TrialIndex = 0;
-        yield return Bout(traitor);
-        if (!lastWin) { yield return Fail("Juno ascends. You fall."); yield break; }
+        yield return Fight(traitor);
+        if (!lastWin) yield break;
         yield return Show("YOU ASCEND", "Juno falls into the fog.", resultTime);
         Finish(FloorState.Reward);
+    }
+
+    private IEnumerator Fight(Fighter foe)
+    {
+        do
+        {
+            yield return Bout(foe);
+            while (choice < 0) yield return null;
+        }
+        while (choice == 1);
+        if (choice < 2) yield break;
+        lastWin = false;
+        Halt();
+        game.SetState(choice == 2 ? FloorState.Archive : FloorState.Menu);
     }
 
     private IEnumerator Bout(Fighter foe)
     {
         foreach (Fighter r in rivals) r.gameObject.SetActive(r == foe);
-        foe.gameObject.SetActive(true);
-        foe.transform.position = rivalSpot.position;
+        foe.gameObject.SetActive(true); foe.transform.position = rivalSpot.position;
         SideA = new[] { player }; SideB = new[] { foe };
         foreach (Fighter f in new[] { player, foe }) Revive(f);
-        board.Clear(); hand.ResetRest();
+        board.Clear(); hand.Reset();
         foe.GetComponent<FighterAI>().Prepare(player);
-        Round = 0;
+        Round = 0; choice = -1;
         game.SetState(FloorState.Hall);
         BoutStarted?.Invoke(foe, TrialIndex);
-        yield return new WaitForSeconds(3.5f);
+        yield return new WaitForSeconds(3f);
         while (!player.IsDown && !foe.IsDown)
         {
-            Round++;
-            RoundStarted?.Invoke(Round);
+            RoundStarted?.Invoke(++Round);
             yield return Turn(player, foe);
             if (!player.IsDown && !foe.IsDown) yield return Turn(foe, player);
         }
@@ -101,14 +113,13 @@ public class TrialManager : MonoBehaviour
 
     private IEnumerator Turn(Fighter f, Fighter foe)
     {
-        foe.Remember();
         f.StartTurn(libidoPerTurn);
         board.StartTurn(f, foe);
         if (f.IsDown || foe.IsDown) yield break;
         bool skip = f.Consume(StatusType.Skip);
         TurnStarted?.Invoke(f, skip);
         if (skip) { yield return new WaitForSeconds(readTime); yield break; }
-        float body = f.Body, ego = f.Ego, foeBody = foe.Body, foeEgo = foe.Ego;
+        float body = f.Body, foeBody = foe.Body;
         CardData card;
         if (f == player)
         {
@@ -116,29 +127,18 @@ public class TrialManager : MonoBehaviour
             resolved = false;
             hand.BeginTurn(foe);
             while (!resolved) yield return null;
-            card = hand.LastCard;
+            card = played;
         }
         else
         {
             FighterAI ai = f.GetComponent<FighterAI>();
             card = ai.Pick(foe);
-            if (card == null) { yield return Show(f.DisplayName.ToUpper() + " PASSES", "Not enough Libido.", readTime); yield break; }
-            CardAnnounced?.Invoke(f, card);
-            yield return new WaitForSeconds(readTime);
-            yield return ai.Play(card, foe);
-            ai.Plan(foe);
+            if (card != null) yield return new WaitForSeconds(readTime);
+            if (card != null) yield return ai.Play(card, foe);
         }
         yield return new WaitForSeconds(resolveTime);
-        TurnResolved?.Invoke(f, card, foe, f.Body - body, f.Ego - ego, foe.Body - foeBody, foe.Ego - foeEgo);
+        TurnResolved?.Invoke(f, card, foe, f.Body - body, foe.Body - foeBody);
         yield return new WaitForSeconds(readTime);
-    }
-
-    private IEnumerator Fail(string sub)
-    {
-        yield return Show("THE CUT", sub, resultTime);
-        Revive(player);
-        Halt();
-        game.SetState(FloorState.Archive);
     }
 
     private static void Revive(Fighter f)

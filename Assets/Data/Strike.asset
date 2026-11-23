@@ -17,18 +17,13 @@ MonoBehaviour:
   function: 1
   kind: 0
   cost: 2
-  damage: 14
-  ego: 0
+  damage: 20
   heal: 0
-  libido: 0
-  sap: 0
   resolve: 0
-  turns: 0
   statusTurns: 0
-  status: 0
   guard: 0
-  trigger: 0
+  status: 0
   special: 0
-  description: Deal 14 damage.
+  description: Deal 20 damage. Countered by Bastion and Mirror.
   art: {fileID: 2800000, guid: 8b8be9dae35036b4ba2fe744d78fcc06, type: 3}
   voice: {fileID: 8300000, guid: e99257328dee26b4fb02cbce72fc4f32, type: 3}

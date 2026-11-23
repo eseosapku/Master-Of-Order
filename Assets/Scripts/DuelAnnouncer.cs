@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -7,128 +6,127 @@ public class DuelAnnouncer : MonoBehaviour
 {
     [SerializeField] private TrialManager trials;
     [SerializeField] private Board board;
+    [SerializeField] private CoinFlip coin;
+    [SerializeField] private CardHand hand;
     [SerializeField] private FighterHud foeHud;
-    [SerializeField] private TMP_Text banner;
-    [SerializeField] private TMP_Text subtitle;
-    [SerializeField] private AudioSource voice;
-    [SerializeField] private AudioSource gong;
-    [SerializeField] private Fighter[] callers;
-    [SerializeField] private AudioClip[] callouts;
-    [SerializeField] private AudioClip yourTurn, frozenClip, missedClip, victoryClip, defeatClip, beginClip;
+    [SerializeField] private TMP_Text title, logText;
+    [SerializeField] private AudioSource voice, gong;
+    [SerializeField] private AudioClip[] lines;
+    [SerializeField] private GameObject resultPanel, continueButton;
+    [SerializeField] private TMP_Text resultTitle, resultText;
+    [SerializeField] private Transform head;
+    [SerializeField] private int logLines = 8;
+    [SerializeField] private float panelDistance = 1.3f;
 
-    private readonly List<string> notes = new List<string>();
+    private readonly List<string> log = new List<string>();
+    private readonly Queue<AudioClip> queue = new Queue<AudioClip>();
+    private Fighter actor;
     private Fighter[] fighters = new Fighter[0];
+    private int shownClock = -1;
 
     private void Awake() => fighters = FindObjectsByType<Fighter>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+    private static string Key(Fighter f) => f.DisplayName.Split(' ')[0];
+    private static string Pascal(string n) => string.Concat(System.Array.ConvertAll(n.Replace("-", " ").Replace("'", "").Split(' '), w => w.Length > 0 ? char.ToUpper(w[0]) + w.Substring(1) : ""));
+    private void OnHurt(Fighter f, float amount) => Say("Hurt" + Key(f) + Mathf.RoundToInt(amount));
+
     private void OnEnable() => Listen(true);
     private void OnDisable() => Listen(false);
-    private void OnNote(string s) => notes.Add(s.Replace("You's", "Your").Replace("You rewinds", "You rewind"));
-    private void OnFighterNote(Fighter f, string s) => OnNote(s.Replace("You rises", "You rise"));
-    private void OnBoutEnded(int index, bool won) => Say(won ? victoryClip : defeatClip);
 
     private void Listen(bool on)
     {
-        trials.Message -= Show; trials.BoutStarted -= OnBoutStarted; trials.TurnStarted -= OnTurnStarted;
-        trials.CardAnnounced -= OnCardAnnounced; trials.TurnResolved -= OnTurnResolved; trials.BoutEnded -= OnBoutEnded;
-        board.Note -= OnNote; board.IntentRevealed -= OnIntent;
-        foreach (Fighter f in fighters) f.Note -= OnFighterNote;
+        trials.Message -= OnMessage; trials.BoutStarted -= OnBoutStarted; trials.TurnStarted -= OnTurnStarted;
+        trials.TurnResolved -= OnResolved; trials.BoutEnded -= OnBoutEnded; trials.ChoiceMade -= Hide;
+        board.Note -= OnNote; board.Landed -= OnLanded; board.IntentRevealed -= OnIntent; coin.Called -= OnCalled; coin.Flipped -= OnFlipped;
+        foreach (Fighter f in fighters) { f.Damaged -= OnHurt; if (on) f.Damaged += OnHurt; }
         if (!on) return;
-        trials.Message += Show; trials.BoutStarted += OnBoutStarted; trials.TurnStarted += OnTurnStarted;
-        trials.CardAnnounced += OnCardAnnounced; trials.TurnResolved += OnTurnResolved; trials.BoutEnded += OnBoutEnded;
-        board.Note += OnNote; board.IntentRevealed += OnIntent;
-        foreach (Fighter f in fighters) f.Note += OnFighterNote;
+        trials.Message += OnMessage; trials.BoutStarted += OnBoutStarted; trials.TurnStarted += OnTurnStarted;
+        trials.TurnResolved += OnResolved; trials.BoutEnded += OnBoutEnded; trials.ChoiceMade += Hide;
+        board.Note += OnNote; board.Landed += OnLanded; board.IntentRevealed += OnIntent; coin.Called += OnCalled; coin.Flipped += OnFlipped;
     }
 
-    private void Show(string title, string sub)
+    private void Update()
     {
-        banner.text = title;
-        subtitle.text = sub;
+        int clock = hand != null ? Mathf.CeilToInt(hand.Clock) : -1;
+        if (clock >= 0 && clock != shownClock) title.text = "YOUR TURN  ·  <color=" + (clock <= 5 ? "#FF6B6B" : "#FFFFFF") + ">" + clock + "s</color>";
+        shownClock = clock;
+        if (voice == null || voice.isPlaying || queue.Count == 0) return;
+        voice.clip = queue.Dequeue();
+        voice.Play();
     }
 
-    private string TakeNotes()
+    private void Say(string key)
     {
-        string s = notes.Count > 0 ? "<color=#E8C86A>" + string.Join("  ·  ", notes) + "</color>" : "";
-        notes.Clear();
-        return s;
+        if (string.IsNullOrEmpty(key)) return;
+        foreach (AudioClip c in lines) if (c != null && c.name == "Voice" + key) { queue.Enqueue(c); return; }
+    }
+
+    private void Log(string line)
+    {
+        if (string.IsNullOrEmpty(line)) return;
+        log.Add(line);
+        while (log.Count > logLines) log.RemoveAt(0);
+        logText.text = string.Join("\n", log);
+    }
+
+    private void OnMessage(string head, string sub) { title.text = head; Log(sub); }
+    private void OnNote(string text, string key) { Log(text); Say(text.EndsWith("a hidden card") && actor != null ? "Set" + Key(actor) : key); }
+    private void OnCalled(Fighter f, bool heads) => Log(f.DisplayName + (f == trials.Player ? " call " : " calls ") + (heads ? "HEADS" : "TAILS"));
+    private void Hide() => resultPanel.SetActive(false);
+
+    private void OnFlipped(Fighter f, bool heads, bool right)
+    {
+        Log("The coin lands <b>" + (heads ? "HEADS" : "TAILS") + "</b>");
+        Say(heads ? "Heads" : "Tails");
+    }
+
+    private void OnLanded(CardData c)
+    {
+        Log("<color=#E8C86A>" + (actor == trials.Player ? "You play " : actor.DisplayName + " plays ") + c.cardName.ToUpper() + "</color>");
+        Say("Played" + Key(actor) + Pascal(c.cardName));
     }
 
     private void OnBoutStarted(Fighter foe, int index)
     {
         foeHud.Bind(foe);
-        notes.Clear();
-        Show(index > 0 ? "DUEL " + index + "  ·  " + foe.DisplayName.ToUpper() : "THE FINAL CUT  ·  " + foe.DisplayName.ToUpper(), "One card each turn  ·  you play first");
-        Say(beginClip);
+        log.Clear();
+        queue.Clear();
+        Hide();
+        title.text = index > 0 ? "DUEL " + index + "  ·  " + foe.DisplayName.ToUpper() : "FINAL DUEL  ·  " + foe.DisplayName.ToUpper();
+        Log("You play first. One card per turn, 20 seconds to choose.");
         if (gong != null) gong.Play();
     }
 
     private void OnTurnStarted(Fighter f, bool skipped)
     {
-        bool me = f == trials.Player;
-        string before = TakeNotes();
-        string pre = before.Length > 0 ? before + "\n" : "";
-        if (skipped) { Show((me ? "YOU LOSE" : f.DisplayName.ToUpper() + " LOSES") + " THE TURN", pre + "Frozen in place."); Say(frozenClip); }
-        else if (me) { Show("YOUR TURN", pre + "Pick a card on your right-hand panel  ·  press PLAY"); Say(yourTurn); }
-        else Show(f.DisplayName.ToUpper() + "'S TURN", pre + "Read the board  ·  what will they do?");
-    }
-
-    private void OnCardAnnounced(Fighter f, CardData card)
-    {
-        if (card.kind == CardKind.Omen)
-        {
-            Show(f.DisplayName.ToUpper() + " SETS A HIDDEN OMEN", "A face-down card  ·  it will trigger later. Guess what it is.");
-            Say(Callout(f));
-            return;
-        }
-        Show(f.DisplayName.ToUpper() + " PLAYS " + card.cardName.ToUpper(), "<size=80%>" + card.KindLabel + "</size>  ·  " + card.description);
-        StartCoroutine(SayPair(Callout(f), card.voice));
+        actor = f;
+        title.text = f == trials.Player ? "YOUR TURN" : f.DisplayName.ToUpper() + "'S TURN";
+        if (!skipped) return;
+        Log(f.DisplayName + (f == trials.Player ? " lose" : " loses") + " this turn");
+        Say("TurnLost");
     }
 
     private void OnIntent(Fighter f)
     {
         FighterAI ai = f.GetComponent<FighterAI>();
-        CardData next = ai != null ? ai.Intent : null;
-        notes.Add(next != null ? f.DisplayName + " plans to play " + next.cardName.ToUpper() : f.DisplayName + "'s plans are laid bare");
-        if (next != null) StartCoroutine(SayPair(null, next.voice));
+        Log(ai != null && ai.Intent != null ? f.DisplayName + " plans to play <b>" + ai.Intent.cardName.ToUpper() + "</b>" : f.Possessive + " hidden cards are revealed");
     }
 
-    private void OnTurnResolved(Fighter f, CardData card, Fighter foe, float body, float ego, float foeBody, float foeEgo)
+    private void OnResolved(Fighter f, CardData c, Fighter foe, float body, float foeBody)
     {
-        bool me = f == trials.Player;
-        string title = card == null ? (me ? "YOU PASS" : f.DisplayName.ToUpper() + " PASSES") : (me ? "YOU PLAYED " : f.DisplayName.ToUpper() + " PLAYED ") + (card.kind == CardKind.Omen && !me ? "A HIDDEN OMEN" : card.cardName.ToUpper());
-        string result = (Delta(foe, foeBody, foeEgo) + "   " + Delta(f, body, ego)).Trim();
-        string extra = TakeNotes();
-        bool missed = extra.Contains("miss") || extra.Contains("passes through") || extra.Contains("fizzles") || extra.Contains("cancelled");
-        Show(title, (result.Length > 0 ? result : "No direct change") + (extra.Length > 0 ? "\n" + extra : ""));
-        if (missed) Say(missedClip);
+        if (c == null) Log(f == trials.Player ? "You pass" : f.DisplayName + " passes");
+        if (c == null && f == trials.Player) Say("TimeUp");
     }
 
-    private string Delta(Fighter x, float body, float ego)
+    private void OnBoutEnded(int index, bool won)
     {
-        string r = "";
-        if (body <= -0.5f) r += "<color=#FF6B6B>-" + Mathf.RoundToInt(-body) + " Body</color> ";
-        if (body >= 0.5f) r += "<color=#7CFFB0>+" + Mathf.RoundToInt(body) + " Body</color> ";
-        if (ego <= -0.5f) r += "<color=#7FA8FF>-" + Mathf.RoundToInt(-ego) + " Ego</color> ";
-        foreach (KeyValuePair<StatusType, int> s in x.Statuses) r += "<color=#E8C86A>[" + s.Key + "]</color> ";
-        return r.Length > 0 ? (x == trials.Player ? "You" : x.DisplayName) + ":  " + r : "";
-    }
-
-    private AudioClip Callout(Fighter f)
-    {
-        for (int i = 0; i < callers.Length && i < callouts.Length; i++) if (callers[i] == f) return callouts[i];
-        return null;
-    }
-
-    private void Say(AudioClip c)
-    {
-        if (voice == null || c == null) return;
-        voice.Stop();
-        voice.PlayOneShot(c);
-    }
-
-    private IEnumerator SayPair(AudioClip a, AudioClip b)
-    {
-        Say(a);
-        if (a != null) yield return new WaitForSeconds(a.length);
-        Say(b);
+        Fighter foe = trials.SideB.Length > 0 ? trials.SideB[0] : null;
+        resultTitle.text = won ? "VICTORY" : "DEFEAT";
+        resultText.text = foe == null ? "" : won ? foe.DisplayName + " falls.  You stand with " + Mathf.CeilToInt(trials.Player.Body) + " Body." : foe.DisplayName + " wins with " + Mathf.CeilToInt(foe.Body) + " Body left.";
+        continueButton.SetActive(won);
+        Transform h = head != null ? head : Camera.main.transform;
+        Vector3 flat = Vector3.ProjectOnPlane(h.forward, Vector3.up).normalized;
+        resultPanel.transform.SetPositionAndRotation(h.position + flat * panelDistance, Quaternion.LookRotation(flat));
+        resultPanel.SetActive(true);
+        Say(won ? "Victory" : "Defeat");
     }
 }

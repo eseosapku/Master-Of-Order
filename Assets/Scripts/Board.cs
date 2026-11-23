@@ -1,31 +1,37 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class FieldUnit { public CardData card; public Fighter owner; public int resolve, countdown, slot; public bool revealed; public Vector3 at; }
+public class FieldUnit { public CardData card; public Fighter owner; public int resolve, slot; public bool revealed; public Vector3 at; }
+
+public interface ISatchel { void Seal(CardData c, int turns); void SealRandom(); void Unseal(); CardData Take(); void Give(CardData c); }
 
 public class Board : MonoBehaviour
 {
-    [SerializeField] private int slots = 3, snareDamage = 15, thornDamage = 6, clauseDamage = 4, coinBackfire = 8, dispelLimit = 15;
-    [SerializeField] private float slotForward = 1.7f, slotSpacing = 1.15f, decoyMiss = 0.5f, mirageMiss = 0.3f, panicFizzle = 0.3f;
+    [SerializeField] private CoinFlip coin;
+    [SerializeField] private int slots = 3, sealTurns = 3;
+    [SerializeField] private float slotForward = 1.7f, slotSpacing = 1.15f;
 
     public event Action<FieldUnit> UnitPlaced, UnitChanged, UnitRemoved;
-    public event Action<Fighter, CardData, int> RestAdded;
     public event Action<Fighter> IntentRevealed;
-    public event Action<string> Note;
+    public event Action<string, string> Note;
+    public event Action<CardData> Landed;
 
     public List<FieldUnit> Units { get; } = new List<FieldUnit>();
-    private readonly Dictionary<Fighter, CardData> last = new Dictionary<Fighter, CardData>(), lastInstant = new Dictionary<Fighter, CardData>(), foreseen = new Dictionary<Fighter, CardData>();
+    private readonly Dictionary<Fighter, ISatchel> satchels = new Dictionary<Fighter, ISatchel>();
+    private readonly Dictionary<Fighter, CardData> last = new Dictionary<Fighter, CardData>();
+    private bool call, bounced;
 
-    public bool Foreseen(Fighter f, CardData c) => c != null && foreseen.TryGetValue(f, out CardData x) && x == c;
-    public int Cost(CardData c, Fighter f) => c.cost + (f.Has(StatusType.Shackled) ? 3 : 0);
-    public FieldUnit Guard(Fighter f) => Units.Find(u => u.owner == f && u.card.kind == CardKind.Field && u.card.guard);
-    private bool Has(Fighter f, Special s) => Units.Exists(u => u.owner == f && u.card.special == s);
-    private bool Nulled => Units.Exists(u => u.card.special == Special.NullZone);
-    private void Say(string s) => Note?.Invoke(s);
+    public void Register(Fighter f, ISatchel s) => satchels[f] = s;
+    public int Cost(CardData c, Fighter f) => c.cost + (f.Has(StatusType.Slowed) ? 2 : 0);
+    public FieldUnit Guard(Fighter f) => Units.Find(u => u.owner == f && u.card.guard);
+    public bool HasHidden(Fighter f) => Units.Exists(u => u.owner == f && !u.revealed);
+    private void Say(string s, string voice = null) => Note?.Invoke(s, voice);
+    private static string Does(Fighter f, string verb) => f.DisplayName + " " + verb + (f.DisplayName == "You" ? "" : "s");
     private void Remove(FieldUnit u) { if (Units.Remove(u)) UnitRemoved?.Invoke(u); }
-    public void Clear() { foreach (FieldUnit u in Units.ToArray()) Remove(u); last.Clear(); lastInstant.Clear(); foreseen.Clear(); }
+    public void Clear() { foreach (FieldUnit u in Units.ToArray()) Remove(u); last.Clear(); }
 
     public Vector3 SlotPosition(Fighter owner, Fighter foe, int i)
     {
@@ -43,108 +49,99 @@ public class Board : MonoBehaviour
     {
         if (c.kind != CardKind.Instant) return SlotPosition(caster, foe, NextSlot(caster)) + Vector3.up * 0.7f;
         if (!c.Offensive) return caster.transform.position + Vector3.up * 1.2f;
-        FieldUnit g = c.special == Special.Pierce || c.special == Special.Shockwave ? null : Guard(foe);
-        return g != null ? SlotPosition(foe, caster, g.slot) + Vector3.up * 0.7f : foe.transform.position + Vector3.up * 1.2f;
+        FieldUnit g = c.special == Special.Shatter ? Units.FindLast(u => u.owner == foe) : c.special == Special.Pierce ? null : Guard(foe);
+        return g != null ? g.at + Vector3.up * 0.7f : foe.transform.position + Vector3.up * 1.2f;
     }
 
-    public void Play(CardData c, Fighter caster, Fighter foe)
+    public IEnumerator Play(CardData c, Fighter caster, Fighter foe)
     {
         caster.Spend(Cost(c, caster));
-        caster.Consume(StatusType.Shackled);
-        if (Foreseen(caster, c)) { foreseen.Remove(caster); Say(c.cardName + " was foreseen  ·  it fizzles"); return; }
-        foreseen.Remove(caster);
-        if (caster.Consume(StatusType.Panic) && Random.value < panicFizzle) { Say(caster.DisplayName + " panics  ·  " + c.cardName + " fizzles"); return; }
-        foreach (FieldUnit u in Units.ToArray()) if (u.owner == foe && u.card.special == Special.Clause) { caster.Damage(clauseDamage); Say("Clause  ·  " + caster.DisplayName + " pays " + clauseDamage + " Body"); }
-        last[caster] = c;
-        if (!Intercept(c, caster, foe)) Resolve(c, caster, foe);
+        CardData real = c;
+        if (c.special == Special.Echo && !last.TryGetValue(caster, out real)) { Say("Echo finds nothing to repeat", "Fizzles"); yield break; }
+        if (c.special == Special.Echo) Say("Echo replays " + real.cardName);
+        last[caster] = real;
+        if (Intercept(real, caster, foe)) yield break;
+        call = true; bounced = false;
+        if (real.Coin && coin != null) yield return coin.Flip(caster, caster.GetComponent<FighterAI>() == null, r => call = r);
+        Resolve(real, caster, foe);
     }
 
     private bool Intercept(CardData c, Fighter caster, Fighter foe)
     {
-        if (Nulled) return false;
         foreach (FieldUnit u in Units.ToArray())
         {
-            if (u.owner != foe || u.card.kind != CardKind.Omen || u.card.trigger == OmenTrigger.Countdown || c.kind == CardKind.Omen) continue;
-            if ((u.card.trigger == OmenTrigger.FoeField) != (c.kind == CardKind.Field) || (c.kind == CardKind.Instant && !c.Offensive)) continue;
-            Remove(u);
-            Say(foe.DisplayName + "'s Omen  ·  " + u.card.cardName + "!");
-            if (u.card.special == Special.Reflect) { Say(c.cardName + " bounces back"); Resolve(c, foe, caster); return true; }
-            if (u.card.special == Special.Cancel) { Say(c.cardName + " is cancelled"); return true; }
-            if (u.card.special == Special.Bounce) { Say(c.cardName + " returns to the hand"); RestAdded?.Invoke(caster, c, 2); return true; }
-            Resolve(c, caster, foe);
-            if (Units.FindLast(x => x.owner == caster) is FieldUnit landed) Strike(landed, snareDamage, null);
-            return true;
+            if (u.owner != foe || u.card.kind != CardKind.Hidden) continue;
+            if (u.card.special == Special.Negate) { Remove(u); Say(foe.Possessive + " Negate cancels " + c.cardName, "Negated"); return true; }
+            if (u.card.special == Special.Mirror && c.kind == CardKind.Instant && c.Offensive) { Remove(u); Say(foe.Possessive + " Mirror bounces " + c.cardName + " back", "Reflected"); call = true; bounced = true; Resolve(c, foe, caster); return true; }
         }
         return false;
     }
 
     private void Resolve(CardData c, Fighter caster, Fighter foe)
     {
-        if (c.kind == CardKind.Instant) { if (c.special != Special.Echo) lastInstant[caster] = c; Apply(c, caster, foe); return; }
+        if (c.kind == CardKind.Instant) { Apply(c, caster, foe); return; }
         if (Units.FindAll(u => u.owner == caster).Count >= slots) Remove(Units.Find(u => u.owner == caster));
-        FieldUnit n = new FieldUnit { card = c, owner = caster, resolve = c.resolve, countdown = c.turns, slot = NextSlot(caster), revealed = c.kind == CardKind.Field, at = SlotPosition(caster, foe, NextSlot(caster)) };
-        Units.Add(n);
-        UnitPlaced?.Invoke(n);
-        if (c.special == Special.Phoenix) caster.AddStatus(StatusType.Phoenix, c.turns);
+        FieldUnit n = new FieldUnit { card = c, owner = caster, resolve = c.resolve, slot = NextSlot(caster), revealed = c.kind == CardKind.Field, at = SlotPosition(caster, foe, NextSlot(caster)) };
+        Units.Add(n); UnitPlaced?.Invoke(n);
+        if (c.kind == CardKind.Field) Landed?.Invoke(c); else Say(Does(caster, "set") + " a hidden card");
     }
 
     private void Apply(CardData c, Fighter caster, Fighter foe)
     {
-        CardData x;
+        string right = call ? "Right call" : "Wrong call", voice = call ? "Right" : "Wrong";
         switch (c.special)
         {
-            case Special.Copy: if (last.TryGetValue(foe, out x) && x.special != Special.Copy) { Say("Copy becomes " + x.cardName); Resolve(x, caster, foe); } else Say("Nothing to copy"); return;
-            case Special.Rewind: caster.Rewind(); Say(caster.DisplayName + " rewinds their last wounds"); return;
-            case Special.Echo: if (lastInstant.TryGetValue(caster, out x)) { Say("Long Echo repeats " + x.cardName); Apply(x, caster, foe); } return;
-            case Special.CoinToss: if (Random.value < 0.5f) { Say("Coin Toss  ·  heads!"); break; } Say("Coin Toss  ·  tails, it backfires"); caster.Damage(coinBackfire); return;
-            case Special.LoadedDie: int roll = Random.Range(1, 7); Say("Loaded Die rolls " + roll); Hit(foe, caster, roll <= 3 ? 4 : roll <= 5 ? 8 : 16, false); return;
-            case Special.Dispel: FieldUnit w = Units.Find(u => u.owner == foe && u.card.kind == CardKind.Field && u.resolve <= dispelLimit);
-                if (w != null) { Say("Dispel shatters " + w.card.cardName); Remove(w); } else { foe.ClearStatuses(); Say("Dispel wipes " + foe.DisplayName + "'s effects"); } return;
-            case Special.CardLock: if (last.TryGetValue(foe, out x)) { RestAdded?.Invoke(foe, x, 2); Say(x.cardName + " is locked for 2 more turns"); } break;
-            case Special.Glimpse: case Special.ReadHand:
-                foreach (FieldUnit u in Units) if (u.owner == foe && !u.revealed) { u.revealed = true; UnitChanged?.Invoke(u); }
-                if (c.special == Special.ReadHand && foe.TryGetComponent(out FighterAI ai) && ai.Intent != null) foreseen[foe] = ai.Intent;
+            case Special.Gamble: if (call) { Say(right, voice); break; } Say(right + "  ·  Gamble Blow hits " + caster.DisplayName + " for " + c.damage, voice); caster.Damage(c.damage); return;
+            case Special.Stillframe: (call ? foe : caster).AddStatus(StatusType.Skip, 1); Say(right + "  ·  " + (call ? foe : caster).DisplayName + " will lose the next turn", voice); return;
+            case Special.Double: caster.AddStatus(call ? StatusType.Doubled : StatusType.Fumble, 99); Say(right + "  ·  " + caster.Possessive + " next attack " + (call ? "deals double" : "will fizzle"), voice); return;
+            case Special.Thief:
+                Fighter from = call ? foe : caster, to = call ? caster : foe;
+                CardData stolen = satchels.ContainsKey(from) ? satchels[from].Take() : null;
+                if (stolen != null && satchels.ContainsKey(to)) satchels[to].Give(stolen);
+                Say(right + "  ·  " + Does(to, "steal") + " " + (stolen != null ? stolen.cardName : "nothing") + " from " + from.DisplayName, voice); return;
+            case Special.Shatter:
+                FieldUnit t = Units.FindLast(u => u.owner == foe);
+                if (t == null) { Say("Shatter finds nothing on the field", "Fizzles"); return; }
+                Landed?.Invoke(c);
+                if (t.card.kind == CardKind.Hidden) { Remove(t); Say("Shatter destroys a hidden " + t.card.cardName, "Broken"); } else Strike(t, c.damage); return;
+            case Special.Glimpse: foreach (FieldUnit u in Units) if (u.owner == foe && !u.revealed) { u.revealed = true; UnitChanged?.Invoke(u); }
                 IntentRevealed?.Invoke(foe);
                 break;
-            case Special.Shockwave: foreach (FieldUnit u in Units.ToArray()) if (u.owner == foe && u.card.kind == CardKind.Field) Strike(u, c.damage, caster); break;
+            case Special.Cleanse: caster.ClearStatuses(); if (satchels.ContainsKey(caster)) satchels[caster].Unseal(); break;
+            case Special.Seal: if (last.TryGetValue(foe, out CardData x) && satchels.ContainsKey(foe)) { satchels[foe].Seal(x, sealTurns); Say(foe.Possessive + " " + x.cardName + " is sealed for " + sealTurns + " turns"); } break;
         }
-        int dmg = c.damage + (c.special == Special.Charged && caster.Libido >= 5 ? 10 : 0);
-        if (dmg > 0) Hit(foe, caster, dmg, c.special == Special.Pierce || c.special == Special.Shockwave);
-        foe.Mind(c.ego);
+        int dmg = c.damage;
+        if (dmg > 0 && !bounced && caster.Consume(StatusType.Fumble)) { Say(c.cardName + " fizzles", "Fizzles"); return; }
+        if (dmg > 0 && !bounced && caster.Consume(StatusType.Doubled)) { dmg *= 2; Say("Double damage!"); }
+        Landed?.Invoke(c);
+        if (dmg > 0) Hit(foe, dmg, c.special == Special.Pierce);
         caster.Heal(c.heal);
-        if (c.libido != 0) caster.GainLibido(c.libido);
-        if (c.sap > 0) foe.GainLibido(-c.sap);
         if (c.statusTurns > 0) foe.AddStatus(c.status, c.statusTurns);
     }
 
-    private void Hit(Fighter target, Fighter attacker, int dmg, bool pierce)
+    private void Hit(Fighter target, int dmg, bool pierce)
     {
         FieldUnit g = pierce ? null : Guard(target);
-        if (!pierce && Has(target, Special.Mirage) && Random.value < mirageMiss) { Say("Mirage  ·  the attack misses"); return; }
-        if (g != null && g.card.special == Special.Decoy && Random.value < decoyMiss) { Say("Decoy  ·  the attack passes through"); return; }
-        if (g != null) Strike(g, dmg, attacker); else target.Damage(dmg);
+        if (g != null) Strike(g, dmg); else { target.Damage(dmg); Say(dmg + " damage to " + target.DisplayName); }
     }
 
-    private void Strike(FieldUnit u, int dmg, Fighter attacker)
+    private void Strike(FieldUnit u, int dmg)
     {
-        if (u.card.special == Special.Thorns && attacker != null) { attacker.Damage(thornDamage); Say("Thorn Ward cuts back " + thornDamage); }
         u.resolve -= dmg;
-        if (u.resolve <= 0) { Say(u.card.cardName + " is destroyed"); Remove(u); } else { Say(u.card.cardName + " absorbs " + dmg); UnitChanged?.Invoke(u); }
+        if (u.resolve <= 0) { Say(u.owner.Possessive + " " + u.card.cardName + " breaks", "Broken"); Remove(u); } else { Say(u.owner.Possessive + " " + u.card.cardName + " absorbs " + dmg, "Blocked"); UnitChanged?.Invoke(u); }
     }
 
     public void StartTurn(Fighter owner, Fighter foe)
     {
         foreach (FieldUnit u in Units.ToArray())
         {
-            if (u.owner != owner || !Units.Contains(u)) continue;
-            CardData c = u.card;
-            if (c.kind == CardKind.Field) { if (c.damage + c.heal + c.ego + c.libido > 0 || c.special == Special.LoadedDie) Apply(c, owner, foe); continue; }
-            if (c.trigger != OmenTrigger.Countdown || Nulled) continue;
-            if (--u.countdown > 0) { UnitChanged?.Invoke(u); continue; }
-            Remove(u);
-            if (c.special == Special.Phoenix) continue;
-            Say(owner.DisplayName + "'s Omen  ·  " + c.cardName + "!");
-            Apply(c, owner, foe);
+            if (u.owner != owner || u.card.kind != CardKind.Field || !Units.Contains(u)) continue;
+            if (u.card.heal > 0) { owner.Heal(u.card.heal); Say(u.card.cardName + " heals " + owner.DisplayName + " " + u.card.heal, "Healed"); }
+            if (u.card.special == Special.Erosion && satchels.ContainsKey(foe)) { satchels[foe].SealRandom(); Say("Erosion seals one of " + foe.Possessive + " cards for good", "Eroded"); }
+            if (u.card.special != Special.LoadedDie) continue;
+            int roll = Random.Range(1, 7), dmg = roll <= 2 ? 0 : roll <= 5 ? 10 : 20;
+            Say("Loaded Die rolls " + roll + (dmg > 0 ? "" : "  ·  nothing"));
+            if (dmg > 0) Hit(foe, dmg, false);
         }
     }
 }

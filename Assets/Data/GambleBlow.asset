@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cff472a75033ad4380bb934c4d375f3, type: 3}
+  m_Name: GambleBlow
+  m_EditorClassIdentifier: Assembly-CSharp::CardData
+  cardName: Gamble Blow
+  family: 3
+  function: 1
+  kind: 0
+  cost: 1
+  damage: 20
+  heal: 0
+  resolve: 0
+  statusTurns: 0
+  guard: 0
+  status: 0
+  special: 3
+  description: 'Call the coin. Right: deal 20 damage. Wrong: you take the 20 yourself.'
+  art: {fileID: 2800000, guid: 4ea6e661d82ec8044be0994c99c9db68, type: 3}
+  voice: {fileID: 8300000, guid: f3fe940f3619ea343a03086b8335b034, type: 3}

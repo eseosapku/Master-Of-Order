@@ -43,19 +43,22 @@ public class CardEffects : MonoBehaviour
 
     private void Listen(bool on)
     {
-        foreach (Fighter f in fighters)
-        {
-            f.Damaged -= OnDamaged;
-            f.Defeated -= OnDefeated;
-            if (on) { f.Damaged += OnDamaged; f.Defeated += OnDefeated; }
-        }
-        board.UnitPlaced -= OnPlaced;
-        board.UnitChanged -= OnChanged;
-        board.UnitRemoved -= OnRemoved;
+        foreach (Fighter f in fighters) { f.Damaged -= OnDamaged; f.Defeated -= OnDefeated; f.Changed -= OnFighter; if (on) { f.Damaged += OnDamaged; f.Defeated += OnDefeated; f.Changed += OnFighter; } }
+        board.UnitPlaced -= OnPlaced; board.UnitChanged -= OnChanged; board.UnitRemoved -= OnRemoved; ThrowableCard.Launched -= OnLaunched; ThrowableCard.Arrived -= OnArrived;
         if (!on) return;
-        board.UnitPlaced += OnPlaced;
-        board.UnitChanged += OnChanged;
-        board.UnitRemoved += OnRemoved;
+        board.UnitPlaced += OnPlaced; board.UnitChanged += OnChanged; board.UnitRemoved += OnRemoved; ThrowableCard.Launched += OnLaunched; ThrowableCard.Arrived += OnArrived;
+    }
+
+    private static Animator Anim(Fighter f) { Animator a = f.GetComponent<Animator>(); return a != null && a.runtimeAnimatorController != null ? a : null; }
+    private void OnArrived(ThrowableCard c, Vector3 at) => Burst(at, functionColors[(int)c.Data.function], 4f);
+    private void OnFighter(Fighter f) { if (Anim(f) != null) Anim(f).speed = f.Has(StatusType.Skip) && !f.IsDown ? 0f : 1f; }
+
+    private void OnLaunched(ThrowableCard c)
+    {
+        if (throwSound == null) return;
+        throwSound.transform.position = c.transform.position;
+        throwSound.pitch = Random.Range(0.9f, 1.1f);
+        throwSound.Play();
     }
 
     private void OnPlaced(FieldUnit u)
@@ -73,10 +76,11 @@ public class CardEffects : MonoBehaviour
     private void OnChanged(FieldUnit u)
     {
         if (!shown.TryGetValue(u, out ThrowableCard v)) return;
-        string count = u.card.trigger == OmenTrigger.Countdown ? "  ·  in " + u.countdown : "  ·  waiting";
-        if (u.card.kind == CardKind.Field) v.Show(u.card.art, u.card.cardName + (u.card.resolve > 0 ? "  ·  " + u.resolve + " RESOLVE" : "") + (u.card.guard ? "  ·  GUARD" : ""));
-        else v.Show(u.revealed ? u.card.art : cardBack, (u.revealed ? u.card.cardName : "HIDDEN OMEN") + count);
+        bool mine = u.owner == player;
+        if (u.card.kind == CardKind.Field) v.Show(u.card.art, u.card.cardName + "  ·  " + u.resolve + (u.card.guard ? " GUARD" : " HP"));
+        else v.Show(u.revealed || mine ? u.card.art : cardBack, u.revealed || mine ? u.card.cardName + "  ·  hidden" : "HIDDEN CARD");
         v.Tint(u.card.kind == CardKind.Field && u.card.resolve > 0 && u.resolve * 2 <= u.card.resolve ? new Color(1f, 0.6f, 0.6f) : Color.white);
+        if (u.card.kind == CardKind.Field && u.resolve < u.card.resolve && Anim(u.owner) != null) Anim(u.owner).SetTrigger("Block");
     }
 
     private void OnRemoved(FieldUnit u)
@@ -89,8 +93,7 @@ public class CardEffects : MonoBehaviour
 
     private void OnDamaged(Fighter f, float amount)
     {
-        Animator a = f.GetComponent<Animator>();
-        if (a != null && a.runtimeAnimatorController != null && !f.IsDown) a.SetTrigger(amount >= 15f ? "Knockback" : "Hit");
+        if (Anim(f) != null && !f.IsDown) Anim(f).SetTrigger(amount >= 15f ? "Knockback" : "Hit");
         bool me = f == player && Camera.main != null;
         if (!me) Burst(f.transform.position + Vector3.up * 1.2f, new Color(1f, 0.4f, 0.35f), amount * 0.2f);
         if (me)
@@ -111,8 +114,7 @@ public class CardEffects : MonoBehaviour
 
     private void OnDefeated(Fighter f)
     {
-        Animator an = f.GetComponent<Animator>();
-        if (an != null && an.runtimeAnimatorController != null) an.SetTrigger("Die");
+        if (Anim(f) != null) Anim(f).SetTrigger("Die");
     }
 
     private void Update()
