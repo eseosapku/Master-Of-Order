@@ -10,7 +10,7 @@ public class CardHand : MonoBehaviour
     [SerializeField] private ThrowableCard cardPrefab;
     [SerializeField] private Material faceTemplate;
     [SerializeField] private Transform throwPoint;
-    [SerializeField] private GameManager game;
+    [SerializeField] private Board board;
     [SerializeField] private Fighter owner;
     [SerializeField] private CardData[] starterDeck;
     [SerializeField] private Button[] tiles;
@@ -19,14 +19,12 @@ public class CardHand : MonoBehaviour
     [SerializeField] private Button playButton;
     [SerializeField] private AudioSource voice;
     [SerializeField] private int restTurns = 2;
-    [SerializeField] private float throwWindow = 20f;
+    [SerializeField] private float fieldScale = 3.2f;
     [SerializeField] private Transform head;
     [SerializeField] private float sideAngle = 48f, distance = 0.62f, drop = 0.12f, turnLimit = 70f;
     [SerializeField] private Color[] functionColors = { new Color(0.7f, 0.5f, 1f), new Color(1f, 0.55f, 0.3f), new Color(0.4f, 0.75f, 1f), new Color(0.4f, 1f, 0.65f) };
 
-    public event Action<ThrowableCard, Collider, float> CardLanded;
-    public event Action<ThrowableCard> CardThrown;
-    public event Action<CardData, bool> CardResolved;
+    public event Action<CardData> CardResolved;
 
     public Fighter Owner => owner;
     public CardData LastCard { get; private set; }
@@ -34,7 +32,8 @@ public class CardHand : MonoBehaviour
     private readonly List<CardData> deck = new List<CardData>();
     private readonly List<int> rest = new List<int>();
     private int selected = -1;
-    private bool myTurn, hit;
+    private bool myTurn;
+    private Fighter foe;
     private float yaw = float.NaN, goal = float.NaN;
 
     private void Awake()
@@ -42,6 +41,17 @@ public class CardHand : MonoBehaviour
         for (int i = 0; i < tiles.Length; i++) { int slot = i; tiles[i].onClick.AddListener(() => Select(slot)); }
         playButton.onClick.AddListener(Play);
         if (deck.Count == 0 && starterDeck != null) Fill(new List<CardData>(starterDeck));
+    }
+
+    private void OnEnable() => board.RestAdded += OnRest;
+    private void OnDisable() => board.RestAdded -= OnRest;
+
+    private void OnRest(Fighter f, CardData c, int turns)
+    {
+        int i = deck.IndexOf(c);
+        if (f != owner || i < 0) return;
+        rest[i] += turns;
+        Refresh();
     }
 
     private void LateUpdate()
@@ -55,6 +65,7 @@ public class CardHand : MonoBehaviour
     }
 
     public void Fill(List<CardData> cards) { deck.Clear(); rest.Clear(); foreach (CardData c in cards) Add(c); }
+    public void ResetRest() { for (int i = 0; i < rest.Count; i++) rest[i] = 0; Refresh(); }
 
     public void Add(CardData c)
     {
@@ -63,14 +74,15 @@ public class CardHand : MonoBehaviour
         Refresh();
     }
 
-    public void BeginTurn()
+    public void BeginTurn(Fighter against)
     {
+        foe = against;
         myTurn = true;
         for (int i = 0; i < rest.Count; i++) rest[i] = Mathf.Max(0, rest[i] - 1);
         Refresh();
     }
 
-    private bool Ready(int i) => myTurn && rest[i] == 0 && owner.Libido >= deck[i].cost;
+    private bool Ready(int i) => myTurn && rest[i] == 0 && owner.Libido >= board.Cost(deck[i], owner);
 
     private void Select(int i)
     {
@@ -78,8 +90,9 @@ public class CardHand : MonoBehaviour
         selected = i;
         CardData c = deck[i];
         detailArt.texture = c.art;
-        detailName.text = c.cardName + "   <size=70%>COST " + c.cost + "</size>";
-        detailText.text = c.description + (c.effect == EffectType.Freeze ? " In a duel, they lose their next turn." : "");
+        detailName.text = c.cardName + "   <size=65%>" + c.KindLabel + "  ·  COST " + board.Cost(c, owner) + "</size>";
+        string kind = c.kind == CardKind.Field ? "Stays on your field" + (c.resolve > 0 ? " with " + c.resolve + " Resolve" : "") + (c.guard ? "  ·  GUARD" : "") : c.kind == CardKind.Omen ? "Set face-down  ·  hidden until it triggers" : "Happens at once";
+        detailText.text = "<color=#E8C86A><size=85%>" + kind + "</size></color>\n" + c.description;
         if (voice != null && c.voice != null) { voice.Stop(); voice.PlayOneShot(c.voice); }
         Refresh();
     }
@@ -88,30 +101,23 @@ public class CardHand : MonoBehaviour
     {
         if (selected < 0 || selected >= deck.Count || !Ready(selected)) return;
         CardData c = deck[selected];
-        owner.Spend(c.cost);
         rest[selected] = restTurns + 1;
         myTurn = false;
         LastCard = c;
-        if (c.effect == EffectType.Heal) owner.Heal(c.power);
-        if (c.effect == EffectType.Shield) owner.AddStatus(StatusType.Shielded, 0f, 999f);
         Refresh();
-        if (c.effect == EffectType.Heal || c.effect == EffectType.Shield) { CardResolved?.Invoke(c, true); return; }
-        ThrowableCard card = Instantiate(cardPrefab, throwPoint.position, throwPoint.rotation);
-        card.Setup(c, faceTemplate, game != null ? game.AimAssist : 1f, 999f);
-        card.Thrown += t => CardThrown?.Invoke(t);
-        card.Landed += (k, target, speed) => { hit = target.GetComponentInParent<Fighter>() != null; CardLanded?.Invoke(k, target, speed); };
-        hit = false;
-        StartCoroutine(Watch(card));
+        StartCoroutine(Launch(c));
     }
 
-    private IEnumerator Watch(ThrowableCard card)
+    private IEnumerator Launch(CardData c)
     {
-        status.text = "Your card is floating by this panel  ·  grab it and throw!";
-        for (float t = 0f; card.Floating && t < throwWindow; t += Time.deltaTime) yield return null;
-        for (float w = 0f; w < 3.5f && !card.Floating && !hit; w += Time.deltaTime) yield return null;
-        yield return new WaitForSeconds(0.3f);
+        status.text = c.cardName + " is on its way...";
+        ThrowableCard card = Instantiate(cardPrefab, throwPoint.position, throwPoint.rotation);
+        card.Setup(c, faceTemplate, c.art);
+        yield return card.Fly(board.Aim(c, owner, foe), c.kind == CardKind.Instant ? 1f : fieldScale, head);
         Destroy(card.gameObject);
-        CardResolved?.Invoke(LastCard, hit);
+        board.Play(c, owner, foe);
+        Refresh();
+        CardResolved?.Invoke(c);
     }
 
     private void Refresh()
@@ -122,28 +128,17 @@ public class CardHand : MonoBehaviour
             tiles[i].gameObject.SetActive(has);
             if (!has) continue;
             CardData c = deck[i];
-            Color col = functionColors[(int)c.function];
-            tiles[i].transform.Find("Frame").GetComponent<Image>().color = i == selected ? Color.white : col;
+            int cost = board.Cost(c, owner);
+            tiles[i].transform.Find("Frame").GetComponent<Image>().color = i == selected ? Color.white : functionColors[(int)c.function];
             tiles[i].transform.Find("Art").GetComponent<RawImage>().texture = c.art;
             tiles[i].transform.Find("Name").GetComponent<TMP_Text>().text = c.cardName;
-            tiles[i].transform.Find("Cost").GetComponent<TMP_Text>().text = c.cost.ToString();
-            tiles[i].transform.Find("Rest").GetComponent<TMP_Text>().text = rest[i] > 0 ? "REST " + rest[i] : "";
-            tiles[i].GetComponent<CanvasGroup>().alpha = rest[i] > 0 || owner.Libido < c.cost ? 0.4f : 1f;
+            tiles[i].transform.Find("Cost").GetComponent<TMP_Text>().text = cost.ToString();
+            tiles[i].transform.Find("Rest").GetComponent<TMP_Text>().text = rest[i] > 0 ? "REST " + rest[i] : c.kind == CardKind.Instant ? "" : "<size=60%>" + c.KindLabel + "</size>";
+            tiles[i].GetComponent<CanvasGroup>().alpha = rest[i] > 0 || owner.Libido < cost ? 0.4f : 1f;
         }
         bool can = selected >= 0 && selected < deck.Count && Ready(selected);
         playButton.interactable = can;
         playLabel.text = !myTurn ? "WAIT FOR YOUR TURN" : (selected < 0 ? "PICK A CARD" : (can ? "PLAY CARD" : "CAN'T PLAY"));
-        status.text = myTurn ? "Your turn  ·  Libido " + owner.Libido : "Opponent's turn";
-    }
-
-    public static Collider FindTarget(Vector3 from, Vector3 v, float cone)
-    {
-        Collider best = null;
-        foreach (Collider c in Physics.OverlapSphere(from, 25f))
-        {
-            float a = Vector3.Angle(v, c.bounds.center - from);
-            if (c.CompareTag("Target") && a < cone) { cone = a; best = c; }
-        }
-        return best;
+        status.text = myTurn ? "Your turn  ·  Libido " + owner.Libido + (owner.Has(StatusType.Shackled) ? "  ·  SHACKLED +3" : "") : "Opponent's turn";
     }
 }

@@ -76,8 +76,8 @@ public class ArchiveDraft : MonoBehaviour
         detail.localScale = Vector3.one * 0.85f;
         detailArt.texture = card.art;
         detailName.text = card.cardName;
-        detailMeta.text = card.family + "  ·  " + card.function + "  ·  Cost " + card.cost + " Libido";
-        detailText.text = card.description + "\n\n<size=80%><color=#C9B98F>Effect: " + card.effect + "</color></size>";
+        detailMeta.text = card.KindLabel + "  ·  " + card.function + "  ·  Cost " + card.cost + " Libido";
+        detailText.text = card.description + "\n\n<size=80%><color=#C9B98F>" + (card.kind == CardKind.Field ? "Field: stays on the board" + (card.resolve > 0 ? " with " + card.resolve + " Resolve" : "") : card.kind == CardKind.Omen ? "Omen: set face-down, triggers later" : "Instant: happens at once") + "</color></size>";
         Refresh();
     }
 

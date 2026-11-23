@@ -1,150 +1,70 @@
-using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
-using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
-[RequireComponent(typeof(XRGrabInteractable), typeof(Rigidbody))]
 public class ThrowableCard : MonoBehaviour
 {
-    private enum CardState { Slot, Held, Flying, Spent }
-
-    [SerializeField] private float throwScale = 1.7f, gravity = 2.5f, minSpeed = 1.2f, maxLife = 3.5f, spin = 30f;
     [SerializeField] private Renderer face;
     [SerializeField] private TMP_Text label;
     [SerializeField] private TrailRenderer trail;
-
-    public event Action<ThrowableCard, Collider, float> Landed;
-    public event Action<ThrowableCard> Thrown;
+    [SerializeField] private float flightTime = 0.9f, arcHeight = 0.5f, riseTime = 0.45f;
 
     public CardData Data { get; private set; }
-    public bool Floating => state == CardState.Slot || state == CardState.Spent;
-    public Collider Hitbox => GetComponent<Collider>();
 
-    private XRGrabInteractable grab;
-    private Rigidbody rb;
     private Material faceMat;
-    private CardState state;
-    private Vector3 lastPos;
-    private Vector3 handVelocity;
-    private float life, lastSpeed, rechargeAt, recharge, assist;
-    private bool ready = true;
 
     private void Awake()
     {
-        grab = GetComponent<XRGrabInteractable>();
-        rb = GetComponent<Rigidbody>();
-        grab.selectEntered.AddListener(OnGrab);
-        grab.selectExited.AddListener(OnRelease);
+        if (TryGetComponent(out XRGrabInteractable grab)) grab.enabled = false;
+        if (TryGetComponent(out Rigidbody rb)) rb.isKinematic = true;
+        foreach (Collider c in GetComponentsInChildren<Collider>()) c.enabled = false;
         if (trail != null) trail.emitting = false;
     }
 
-    public void Setup(CardData data, Material template, float aimAssist, float rechargeTime)
+    public void Setup(CardData data, Material template, Texture art)
     {
         Data = data;
-        assist = aimAssist;
-        recharge = rechargeTime;
         faceMat = new Material(template);
-        faceMat.SetTexture("_BaseMap", data.art);
-        faceMat.SetTexture("_EmissionMap", data.art);
-        faceMat.SetColor("_EmissionColor", Color.white * 0.6f);
+        Show(art, data.cardName + "  ·  " + data.cost);
         Material[] mats = face.sharedMaterials;
         mats[0] = faceMat;
         face.sharedMaterials = mats;
-        label.text = data.cardName + "  ·  " + data.cost;
-        state = CardState.Slot;
     }
 
-    public void SetReady(bool canPay)
+    public void Show(Texture art, string text)
     {
-        if (canPay == ready || state != CardState.Slot) return;
-        ready = canPay;
-        grab.enabled = canPay;
-        faceMat.SetColor("_BaseColor", canPay ? Color.white : new Color(0.45f, 0.4f, 0.5f));
+        faceMat.SetTexture("_BaseMap", art);
+        faceMat.SetTexture("_EmissionMap", art);
+        faceMat.SetColor("_EmissionColor", Color.white * 0.6f);
+        label.text = text;
     }
 
-    public void Hold(Vector3 pos, Quaternion rot, float follow)
-    {
-        if (!Floating) return;
-        float t = 1f - Mathf.Exp(-follow * Time.deltaTime);
-        transform.SetPositionAndRotation(Vector3.Lerp(transform.position, pos, t), Quaternion.Slerp(transform.rotation, rot, t));
-    }
+    public void Tint(Color c) => faceMat.SetColor("_BaseColor", c);
 
-    private void OnGrab(SelectEnterEventArgs args)
+    public IEnumerator Fly(Vector3 to, float endScale, Transform faceTowards)
     {
-        state = CardState.Held;
-        lastPos = transform.position;
-        handVelocity = Vector3.zero;
-        Buzz(args.interactorObject, 0.25f, 0.05f);
-    }
-
-    private void OnRelease(SelectExitEventArgs args)
-    {
-        if (handVelocity.magnitude < minSpeed)
+        Vector3 start = transform.position;
+        Vector3 baseScale = transform.localScale;
+        for (float t = 0f; t < riseTime; t += Time.deltaTime)
         {
-            state = CardState.Slot;
-            rb.isKinematic = true;
-            return;
+            transform.position = start + Vector3.up * 0.15f * (t / riseTime);
+            yield return null;
         }
-        Buzz(args.interactorObject, 0.6f, 0.08f);
-        Vector3 v = handVelocity * throwScale;
-        Collider target = assist > 0f ? CardHand.FindTarget(transform.position, v, assist > 1.5f ? 22f : 10f) : null;
-        if (target != null) v = Vector3.Slerp(v.normalized, (target.bounds.center - transform.position).normalized, assist > 1.5f ? 0.85f : 0.5f) * v.magnitude;
-        state = CardState.Flying;
-        life = 0f;
-        rb.isKinematic = false;
-        rb.useGravity = false;
-        rb.linearVelocity = v;
-        rb.angularVelocity = transform.up * spin;
+        start = transform.position;
         if (trail != null) trail.emitting = true;
-        Thrown?.Invoke(this);
-    }
-
-    private void Update()
-    {
-        if (state == CardState.Held && Time.deltaTime > 0f)
+        Quaternion from = transform.rotation;
+        for (float t = 0f; t < flightTime; t += Time.deltaTime)
         {
-            handVelocity = Vector3.Lerp(handVelocity, (transform.position - lastPos) / Time.deltaTime, 0.5f);
-            lastPos = transform.position;
+            float k = Mathf.SmoothStep(0f, 1f, t / flightTime);
+            transform.position = Vector3.Lerp(start, to, k) + Vector3.up * Mathf.Sin(k * Mathf.PI) * arcHeight;
+            transform.localScale = Vector3.Lerp(baseScale, baseScale * endScale, k);
+            Vector3 look = faceTowards != null ? transform.position - faceTowards.position : to - start;
+            look.y = 0f;
+            if (look.sqrMagnitude > 0.001f) transform.rotation = Quaternion.Slerp(from, Quaternion.LookRotation(look), k);
+            yield return null;
         }
-        if (state == CardState.Spent && Time.time >= rechargeAt)
-        {
-            state = CardState.Slot;
-            ready = false;
-            SetReady(true);
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (state != CardState.Flying) return;
-        rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
-        lastSpeed = rb.linearVelocity.magnitude;
-        life += Time.fixedDeltaTime;
-        if (life > maxLife) Spend();
-    }
-
-    private void OnCollisionEnter(Collision c)
-    {
-        if (state != CardState.Flying) return;
-        Landed?.Invoke(this, c.collider, lastSpeed);
-        Spend();
-    }
-
-    private void Spend()
-    {
-        state = CardState.Spent;
-        rb.isKinematic = true;
-        grab.enabled = false;
-        rechargeAt = Time.time + recharge;
+        transform.position = to;
         if (trail != null) trail.emitting = false;
-        faceMat.SetColor("_BaseColor", new Color(0.3f, 0.3f, 0.35f));
-    }
-
-    private static void Buzz(IXRInteractor who, float amp, float dur)
-    {
-        XRBaseInputInteractor input = who as XRBaseInputInteractor;
-        if (input != null) input.SendHapticImpulse(amp, dur);
     }
 }

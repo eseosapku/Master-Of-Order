@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,33 +6,42 @@ public class FighterAI : MonoBehaviour
 {
     [SerializeField] private Fighter fighter;
     [SerializeField] private Animator animator;
-    [SerializeField] private GameManager game;
-    [SerializeField] private Renderer cardVisual;
+    [SerializeField] private Board board;
+    [SerializeField] private ThrowableCard cardPrefab;
+    [SerializeField] private Material faceTemplate;
+    [SerializeField] private Texture cardBack;
     [SerializeField] private CardData[] deck;
-    [SerializeField] private float windup = 0.42f;
-    [SerializeField] private float flightSpeed = 8f;
-    [SerializeField] private float inaccuracy = 0.2f;
-    [SerializeField] private float hitRadius = 0.32f;
-    [SerializeField] private float turnSpeed = 6f;
+    [SerializeField] private int restTurns = 2;
+    [SerializeField] private float windup = 0.42f, turnSpeed = 6f, fieldScale = 3.2f, noise = 5f;
 
-    public event Action<CardData, Fighter, Collider, Vector3, float> CardHit;
+    public CardData Intent { get; private set; }
 
-    public bool LastHit { get; private set; }
-
-    private MaterialPropertyBlock block;
+    private readonly Dictionary<CardData, int> rest = new Dictionary<CardData, int>();
     private Transform hand;
     private Fighter facing;
 
     private void Start()
     {
         hand = animator.GetBoneTransform(HumanBodyBones.RightHand);
-        block = new MaterialPropertyBlock();
-        cardVisual.gameObject.SetActive(false);
         animator.SetBool("Showcase", false);
         animator.SetInteger("Mood", 3);
     }
 
+    private void OnEnable() => board.RestAdded += OnRest;
+    private void OnDisable() => board.RestAdded -= OnRest;
+    private void OnRest(Fighter f, CardData c, int turns) { if (f == fighter) rest[c] = Rest(c) + turns; }
+    private int Rest(CardData c) => rest.TryGetValue(c, out int r) ? r : 0;
+
     public void Face(Fighter target) => facing = target;
+    public bool Ready(CardData c) => c != null && Rest(c) == 0 && board.Cost(c, fighter) <= fighter.Libido && !board.Foreseen(fighter, c);
+    public void Prepare(Fighter foe) { Face(foe); rest.Clear(); Plan(foe); }
+    public void Plan(Fighter foe) => Intent = Choose(foe);
+
+    public CardData Pick(Fighter foe)
+    {
+        foreach (CardData c in new List<CardData>(rest.Keys)) rest[c] = Mathf.Max(0, rest[c] - 1);
+        return Ready(Intent) ? Intent : Choose(foe);
+    }
 
     private void Update()
     {
@@ -46,79 +54,49 @@ public class FighterAI : MonoBehaviour
     public CardData Choose(Fighter foe)
     {
         CardData best = null;
-        float bestScore = float.MinValue;
+        float top = float.MinValue;
         foreach (CardData c in deck)
         {
-            if (c.cost > fighter.Libido) continue;
-            float s = c.power + c.cost + UnityEngine.Random.Range(0f, 6f);
-            if ((c.effect == EffectType.Heal || c.effect == EffectType.Drain) && fighter.BodyRatio < 0.45f) s += 25f;
-            if (c.effect == EffectType.Freeze && !foe.Has(StatusType.Frozen)) s += 8f;
-            if (c.family == CardFamily.Hunt && foe.Has(StatusType.Marked)) s -= 20f;
-            if (c.effect == EffectType.Damage && foe.Has(StatusType.Marked)) s += 10f;
-            if (c.effect == EffectType.Damage && foe.Has(StatusType.Shielded)) s -= 12f;
-            if (c.effect == EffectType.Shield && fighter.Has(StatusType.Shielded)) s -= 30f;
-            if (s > bestScore)
-            {
-                bestScore = s;
-                best = c;
-            }
+            if (!Ready(c)) continue;
+            float s = Value(c, foe) - c.cost * 1.5f + Random.Range(0f, noise);
+            if (s > top) { top = s; best = c; }
         }
         return best;
     }
 
-    private Vector3 AimPoint(Fighter f)
+    private float Value(CardData c, Fighter foe)
     {
-        Camera cam = f.GetComponentInChildren<Camera>();
-        if (cam != null) return cam.transform.position + Vector3.down * 0.3f;
-        Collider c = f.GetComponent<Collider>();
-        return c != null ? c.bounds.center + Vector3.up * 0.25f : f.transform.position + Vector3.up * 1.3f;
+        float v = c.damage + c.ego * 0.6f + c.sap * 3f + (c.status == StatusType.Skip ? 14f : 6f) * Mathf.Min(c.statusTurns, 3) + c.libido * 3f + c.heal * (1f - fighter.BodyRatio) * 2.2f;
+        bool foeGuarded = board.Guard(foe) != null;
+        if (c.kind == CardKind.Field) v = v * 3f + c.resolve * 0.4f + (c.guard ? (board.Guard(fighter) == null ? 14f : -12f) : 4f);
+        if (c.kind == CardKind.Omen) v = c.trigger == OmenTrigger.Countdown ? v * 0.9f : 10f;
+        if (c.statusTurns > 0 && foe.Has(c.status)) v -= 20f;
+        switch (c.special)
+        {
+            case Special.Pierce: case Special.Shockwave: if (foeGuarded) v += 12f; break;
+            case Special.Charged: if (fighter.Libido - c.cost >= 5) v += 10f; break;
+            case Special.Copy: v += 7f; break;
+            case Special.Rewind: v += fighter.BodyRatio < 0.5f ? 15f : -10f; break;
+            case Special.CoinToss: v += 6f; break;
+            case Special.Dispel: v += board.Units.Exists(u => u.owner == foe && u.card.kind == CardKind.Field && u.resolve <= 15) ? 15f : -20f; break;
+            case Special.Glimpse: case Special.ReadHand: v += board.Units.Exists(u => u.owner == foe && !u.revealed) ? 12f : -10f; break;
+            case Special.Phoenix: v += fighter.BodyRatio < 0.4f ? 20f : -5f; break;
+        }
+        return v;
     }
 
-    private float Miss(Fighter f, Vector3 at)
+    public IEnumerator Play(CardData c, Fighter foe)
     {
-        Camera cam = f.GetComponentInChildren<Camera>();
-        if (cam == null) return Vector3.Distance(f.GetComponent<Collider>().ClosestPoint(at), at);
-        Vector3 top = cam.transform.position;
-        Vector3 axis = Vector3.down * 1.2f;
-        float t = Mathf.Clamp01(Vector3.Dot(at - top, axis) / axis.sqrMagnitude);
-        return Vector3.Distance(at, top + axis * t) - hitRadius;
-    }
-
-    public IEnumerator Play(CardData card, Fighter victim)
-    {
-        LastHit = false;
-        fighter.Spend(card.cost);
-        Face(victim);
-        animator.SetTrigger(card.effect == EffectType.Heal || card.effect == EffectType.Shield ? "Cast" : "Throw");
+        rest[c] = restTurns + 1;
+        Face(foe);
+        animator.SetTrigger(c.kind == CardKind.Instant && c.Offensive ? "Throw" : "Cast");
         yield return new WaitForSeconds(windup);
-        if (card.effect == EffectType.Heal || card.effect == EffectType.Shield)
-        {
-            if (card.effect == EffectType.Heal) fighter.Heal(card.power);
-            else fighter.AddStatus(StatusType.Shielded, 0f, 999f);
-            LastHit = true;
-            yield break;
-        }
-        Transform v = cardVisual.transform;
-        v.gameObject.SetActive(true);
-        v.position = hand != null ? hand.position : transform.position + Vector3.up * 1.4f;
-        block.SetTexture("_BaseMap", card.art);
-        cardVisual.SetPropertyBlock(block, 0);
-        Vector3 aim = AimPoint(victim) + UnityEngine.Random.insideUnitSphere * inaccuracy;
-        Vector3 start = v.position;
-        float total = Vector3.Distance(start, aim);
-        for (float travelled = 0f; travelled < total + 2f && !fighter.IsDown; travelled += flightSpeed * Time.deltaTime)
-        {
-            Vector3 dir = (aim - start).normalized;
-            v.position = start + dir * travelled + Vector3.up * Mathf.Sin(Mathf.Clamp01(travelled / total) * Mathf.PI) * 0.25f;
-            v.rotation = Quaternion.LookRotation(dir) * Quaternion.Euler(90f, Time.time * 900f, 0f);
-            if (!victim.IsDown && Miss(victim, v.position) < 0.12f)
-            {
-                CardHit?.Invoke(card, fighter, victim.GetComponentInChildren<Collider>(), v.position, flightSpeed);
-                LastHit = true;
-                break;
-            }
-            yield return null;
-        }
-        v.gameObject.SetActive(false);
+        Vector3 from = hand != null ? hand.position : transform.position + Vector3.up * 1.4f;
+        ThrowableCard card = Instantiate(cardPrefab, from, transform.rotation);
+        card.Setup(c, faceTemplate, c.kind == CardKind.Omen ? cardBack : c.art);
+        if (c.kind == CardKind.Omen) card.Show(cardBack, "HIDDEN OMEN");
+        yield return card.Fly(board.Aim(c, fighter, foe), c.kind == CardKind.Instant ? 1f : fieldScale, foe.transform);
+        Destroy(card.gameObject);
+        board.Play(c, fighter, foe);
     }
 }
