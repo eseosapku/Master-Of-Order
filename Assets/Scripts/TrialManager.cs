@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using TMPro;
 using UnityEngine;
 
 public enum TrialPhase { Idle, Prepare, Clash, Reckoning, Result }
@@ -10,28 +9,26 @@ public class TrialManager : MonoBehaviour
     [SerializeField] private GameManager game;
     [SerializeField] private Fighter player;
     [SerializeField] private Fighter[] rivals;
-    [SerializeField] private AudioClip[] rivalCallouts;
-    [SerializeField] private AudioClip traitorCallout;
     [SerializeField] private CardHand hand;
-    [SerializeField] private FighterHud foeHud;
     [SerializeField] private Transform rivalSpot;
-    [SerializeField] private TMP_Text banner, subtitle;
-    [SerializeField] private AudioSource gong, voice;
-    [SerializeField] private AudioClip yourTurn, frozenClip, missedClip, victoryClip, defeatClip, beginClip;
     [SerializeField] private int libidoPerTurn = 3;
-    [SerializeField] private float resolveTime = 2.5f, readTime = 2.8f, resultTime = 5f;
+    [SerializeField] private float resolveTime = 2.5f, readTime = 3.2f, resultTime = 5f;
 
-    public event Action<TrialPhase> PhaseChanged;
+    public event Action<string, string> Message;
+    public event Action<Fighter, int> BoutStarted;
+    public event Action<Fighter, bool> TurnStarted;
+    public event Action<Fighter, CardData> CardAnnounced;
+    public event Action<Fighter, CardData, Fighter, bool, float, float> TurnResolved;
     public event Action<int> RoundStarted;
     public event Action<int, bool> BoutEnded;
 
     public TrialPhase Phase { get; private set; }
     public int TrialIndex { get; private set; }
     public int Round { get; private set; }
+    public Fighter Player => player;
     public Fighter[] SideA { get; private set; } = new Fighter[0];
     public Fighter[] SideB { get; private set; } = new Fighter[0];
 
-    private static readonly string[] Numerals = { "I", "II", "III", "IV", "V" };
     private Coroutine running;
     private bool lastWin, resolved, lastHit;
 
@@ -44,92 +41,74 @@ public class TrialManager : MonoBehaviour
         if (s == FloorState.Hall && Phase == TrialPhase.Idle) running = StartCoroutine(Climb());
         if ((s != FloorState.Menu && s != FloorState.Archive) || running == null) return;
         StopCoroutine(running);
-        running = null;
-        Fighter.Paused = false;
-        SetPhase(TrialPhase.Idle, "", "");
+        Halt();
     }
+
+    private void Halt() { running = null; Fighter.Paused = false; Phase = TrialPhase.Idle; Message?.Invoke("", ""); }
+    private void Finish(FloorState s) { running = null; game.SetState(s); }
+    private IEnumerator Show(string title, string sub, float wait) { Message?.Invoke(title, sub); yield return new WaitForSeconds(wait); }
 
     private IEnumerator Climb()
     {
         Phase = TrialPhase.Prepare;
         for (TrialIndex = 1; TrialIndex <= rivals.Length; TrialIndex++)
         {
-            Fighter foe = rivals[TrialIndex - 1];
-            yield return Bout(foe, "DUEL " + Numerals[TrialIndex - 1] + "  ·  " + foe.DisplayName.ToUpper(), rivalCallouts[TrialIndex - 1]);
+            yield return Bout(rivals[TrialIndex - 1]);
             if (!lastWin) { yield return Fail("The floor gives way. Draft again."); yield break; }
-            SetPhase(TrialPhase.Result, "DUEL " + Numerals[TrialIndex - 1] + " WON", TrialIndex + " of " + rivals.Length + " opponents defeated");
-            yield return new WaitForSeconds(resultTime);
+            yield return Show("DUEL WON", TrialIndex + " of " + rivals.Length + " opponents defeated", resultTime);
         }
-        SetPhase(TrialPhase.Result, "THE FINAL CUT", "One face per pair ascends.");
-        running = null;
-        game.SetState(FloorState.Cut);
+        Message?.Invoke("THE FINAL CUT", "One face per pair ascends.");
+        Finish(FloorState.Cut);
     }
 
     public void StartDuel(Fighter traitor) => running = StartCoroutine(Duel(traitor));
 
     private IEnumerator Duel(Fighter traitor)
     {
-        SetPhase(TrialPhase.Result, "JUNO PLAYS STEAL", "She was never climbing with you.");
-        yield return new WaitForSeconds(resultTime);
-        yield return Bout(traitor, "THE FINAL CUT  ·  JUNO", traitorCallout);
+        yield return Show("JUNO PLAYS STEAL", "She was never climbing with you.", resultTime);
+        TrialIndex = 0;
+        yield return Bout(traitor);
         if (!lastWin) { yield return Fail("Juno ascends. You fall."); yield break; }
-        SetPhase(TrialPhase.Result, "YOU ASCEND", "Juno falls into the fog.");
-        yield return new WaitForSeconds(resultTime);
-        running = null;
-        game.SetState(FloorState.Reward);
+        yield return Show("YOU ASCEND", "Juno falls into the fog.", resultTime);
+        Finish(FloorState.Reward);
     }
 
-    private IEnumerator Bout(Fighter foe, string title, AudioClip callout)
+    private IEnumerator Bout(Fighter foe)
     {
         foreach (Fighter r in rivals) r.gameObject.SetActive(r == foe);
         foe.gameObject.SetActive(true);
         foe.transform.position = rivalSpot.position;
         foe.GetComponent<FighterAI>().Face(player);
-        foeHud.Bind(foe);
-        SideA = new[] { player };
-        SideB = new[] { foe };
-        Revive(player);
-        Revive(foe);
+        SideA = new[] { player }; SideB = new[] { foe };
+        foreach (Fighter f in new[] { player, foe }) Revive(f);
         Fighter.Paused = true;
         Round = 0;
-        SetPhase(TrialPhase.Prepare, title, "Turn-based duel  ·  you play first");
         game.SetState(FloorState.Hall);
-        Say(beginClip);
-        if (gong != null) gong.Play();
+        BoutStarted?.Invoke(foe, TrialIndex);
         yield return new WaitForSeconds(3.5f);
-        while (true)
+        while (!player.IsDown && !foe.IsDown)
         {
             Round++;
             RoundStarted?.Invoke(Round);
-            yield return Turn(player, foe, null);
-            if (player.IsDown || foe.IsDown) break;
-            yield return Turn(foe, player, callout);
-            if (player.IsDown || foe.IsDown) break;
+            yield return Turn(player, foe);
+            if (!player.IsDown && !foe.IsDown) yield return Turn(foe, player);
         }
         Fighter.Paused = false;
         lastWin = !player.IsDown;
-        Say(lastWin ? victoryClip : defeatClip);
         BoutEnded?.Invoke(TrialIndex, lastWin);
     }
 
-    private IEnumerator Turn(Fighter f, Fighter foe, AudioClip callout)
+    private IEnumerator Turn(Fighter f, Fighter foe)
     {
         f.GainLibido(libidoPerTurn);
-        string who = f == player ? "YOU" : f.DisplayName.ToUpper();
-        if (f.Has(StatusType.Frozen))
-        {
-            f.Statuses.RemoveAll(s => s.type == StatusType.Frozen);
-            SetPhase(TrialPhase.Reckoning, who + (f == player ? " ARE" : " IS") + " FROZEN", "The turn is lost.");
-            Say(frozenClip);
-            yield return new WaitForSeconds(readTime);
-            yield break;
-        }
+        bool frozen = f.Has(StatusType.Frozen);
+        Phase = TrialPhase.Clash;
+        TurnStarted?.Invoke(f, frozen);
+        if (frozen) { f.Statuses.RemoveAll(s => s.type == StatusType.Frozen); yield return new WaitForSeconds(readTime); yield break; }
         float body = foe.Body, ego = foe.Ego;
         CardData card;
         if (f == player)
         {
-            SetPhase(TrialPhase.Clash, "YOUR TURN", "Turn to your hand on the right  ·  pick a card  ·  PLAY  ·  throw it");
-            Say(yourTurn);
             game.SetState(FloorState.Trial);
             resolved = false;
             hand.BeginTurn();
@@ -140,41 +119,24 @@ public class TrialManager : MonoBehaviour
         {
             FighterAI ai = f.GetComponent<FighterAI>();
             card = ai.Choose(foe);
-            if (card == null) { SetPhase(TrialPhase.Reckoning, who + " PASSES", "Not enough Libido."); yield return new WaitForSeconds(readTime); yield break; }
-            SetPhase(TrialPhase.Clash, who + " PLAYS " + card.cardName.ToUpper(), card.description);
-            StartCoroutine(SayPair(callout, card.voice));
-            yield return new WaitForSeconds(readTime + (callout != null ? callout.length : 0f));
+            if (card == null) { yield return Show(f.DisplayName.ToUpper() + " PASSES", "Not enough Libido.", readTime); yield break; }
+            CardAnnounced?.Invoke(f, card);
+            yield return new WaitForSeconds(readTime + 1f);
             yield return ai.Play(card, foe);
             lastHit = ai.LastHit;
         }
         Fighter.Paused = false;
         yield return new WaitForSeconds(resolveTime);
         Fighter.Paused = true;
-        SetPhase(TrialPhase.Reckoning, who + (f == player ? " PLAYED " : " PLAYED ") + card.cardName.ToUpper(), Outcome(card, foe, body, ego, f));
-        if (!lastHit) Say(missedClip);
+        TurnResolved?.Invoke(f, card, foe, lastHit, body - foe.Body, ego - foe.Ego);
         yield return new WaitForSeconds(readTime);
-    }
-
-    private string Outcome(CardData card, Fighter foe, float body, float ego, Fighter f)
-    {
-        if (card.effect == EffectType.Heal) return f.DisplayName + " heals " + Mathf.RoundToInt(card.power) + " Body";
-        if (card.effect == EffectType.Shield) return "A shield rises. The next hit is blocked.";
-        if (!lastHit) return "It missed!";
-        string target = foe == player ? "You" : foe.DisplayName;
-        string r = target + ": ";
-        if (body - foe.Body >= 0.5f) r += "-" + Mathf.RoundToInt(body - foe.Body) + " Body  ";
-        if (ego - foe.Ego >= 0.5f) r += "-" + Mathf.RoundToInt(ego - foe.Ego) + " Ego  ";
-        foreach (StatusEffect s in foe.Statuses) r += "[" + s.type + "] ";
-        return r == target + ": " ? target + " shrugs it off" : r;
     }
 
     private IEnumerator Fail(string sub)
     {
-        SetPhase(TrialPhase.Result, "THE CUT", sub);
-        yield return new WaitForSeconds(resultTime);
+        yield return Show("THE CUT", sub, resultTime);
         Revive(player);
-        running = null;
-        SetPhase(TrialPhase.Idle, "", "");
+        Halt();
         game.SetState(FloorState.Archive);
     }
 
@@ -183,22 +145,5 @@ public class TrialManager : MonoBehaviour
         Animator an = f.GetComponent<Animator>();
         if (f.IsDown && an != null && an.runtimeAnimatorController != null) an.SetTrigger("Rise");
         f.Restore();
-    }
-
-    private void Say(AudioClip c) { if (voice != null && c != null) { voice.Stop(); voice.PlayOneShot(c); } }
-
-    private IEnumerator SayPair(AudioClip a, AudioClip b)
-    {
-        Say(a);
-        if (a != null) yield return new WaitForSeconds(a.length);
-        Say(b);
-    }
-
-    private void SetPhase(TrialPhase p, string title, string sub)
-    {
-        Phase = p;
-        banner.text = title;
-        subtitle.text = sub;
-        PhaseChanged?.Invoke(p);
     }
 }

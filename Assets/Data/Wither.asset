@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Cut the target's max Body by 10% this bout.
   art: {fileID: 2800000, guid: eae6e939339b50049a51298ab8a1a699, type: 3}
+  voice: {fileID: 8300000, guid: d799fa92e77673b439656528d69ee5c5, type: 3}

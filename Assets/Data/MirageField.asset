@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Your last card appears three times; one is real.
   art: {fileID: 2800000, guid: b8df90b682674db47940f46bdc8591ae, type: 3}
+  voice: {fileID: 8300000, guid: 4cd8a328b05988e489d9b90bc09d062d, type: 3}

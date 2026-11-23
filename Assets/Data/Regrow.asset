@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Heal 40 Body over 8 seconds.
   art: {fileID: 2800000, guid: 580520b79f858334a9e0ea15c6bbe2d2, type: 3}
+  voice: {fileID: 8300000, guid: 1ae9efce2be6cd240a00007bcd23e1e5, type: 3}

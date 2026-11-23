@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: 'A dome: nothing in or out for 4 seconds.'
   art: {fileID: 2800000, guid: 2e6ef8917e843a94abd08986880d3e04, type: 3}
+  voice: {fileID: 8300000, guid: b76c9adb0893ec1419f194da29a31606, type: 3}

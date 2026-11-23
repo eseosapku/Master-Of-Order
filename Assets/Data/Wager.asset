@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 0
   description: Both stake 20 Body; the next hit takes the pot.
   art: {fileID: 2800000, guid: 714d4bc28cd2d934692817ffd6b38f88, type: 3}
+  voice: {fileID: 8300000, guid: 89262ae65999ea143a21eed552970335, type: 3}

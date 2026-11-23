@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Seal one visible Orbit card for 2 rounds.
   art: {fileID: 2800000, guid: a184c884bed23924c8cd120004194820, type: 3}
+  voice: {fileID: 8300000, guid: f04958158e5f5ac4f878a305025be85a, type: 3}

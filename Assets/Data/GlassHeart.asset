@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 0
   description: Share your next damage with the enemy; take 25% more.
   art: {fileID: 2800000, guid: ae3e96b56ef26bc4bbc7747b5d3d993d, type: 3}
+  voice: {fileID: 8300000, guid: a39bd7c486c19534bb3f13ad4e4adaa7, type: 3}

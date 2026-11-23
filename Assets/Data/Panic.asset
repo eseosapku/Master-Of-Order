@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Shuffle the enemy's Orbit so they grab the wrong card.
   art: {fileID: 2800000, guid: 8552e4a4d78c97440b49b3982978aa18, type: 3}
+  voice: {fileID: 8300000, guid: 900cb0d04e26ade47ba0f235b1c7c909, type: 3}

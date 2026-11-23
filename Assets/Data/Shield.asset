@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Block the next hit.
   art: {fileID: 2800000, guid: 2e6ef8917e843a94abd08986880d3e04, type: 3}
+  voice: {fileID: 8300000, guid: dc82c083cdbd70a44a0d7e0f19cc212b, type: 3}

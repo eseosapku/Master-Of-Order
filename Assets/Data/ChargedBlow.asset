@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 0
   description: Grows stronger the longer you hold it.
   art: {fileID: 2800000, guid: 8b8be9dae35036b4ba2fe744d78fcc06, type: 3}
+  voice: {fileID: 8300000, guid: 6d4c2e9536fd76344aa74eb4d35639a7, type: 3}

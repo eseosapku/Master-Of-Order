@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 8
   description: Juno's card. Take the next hit meant for you, forever.
   art: {fileID: 2800000, guid: 03f669967ae156d4ab5e4f65fc710f1c, type: 3}
+  voice: {fileID: 8300000, guid: ad7529530227c704f96edfe994da2320, type: 3}

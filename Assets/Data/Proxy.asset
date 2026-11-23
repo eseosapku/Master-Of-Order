@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Take all damage meant for your partner for 5 s.
   art: {fileID: 2800000, guid: f285a1485d9157441a46e57209b37f49, type: 3}
+  voice: {fileID: 8300000, guid: 873e483cc36673d4db16c363d9f682af, type: 3}

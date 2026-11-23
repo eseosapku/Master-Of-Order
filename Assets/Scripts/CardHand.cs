@@ -32,8 +32,7 @@ public class CardHand : MonoBehaviour
     private readonly List<CardData> deck = new List<CardData>();
     private readonly List<int> rest = new List<int>();
     private int selected = -1;
-    private bool myTurn;
-    private bool hit;
+    private bool myTurn, hit;
 
     private void Awake()
     {
@@ -77,11 +76,7 @@ public class CardHand : MonoBehaviour
         detailArt.texture = c.art;
         detailName.text = c.cardName + "   <size=70%>COST " + c.cost + "</size>";
         detailText.text = c.description + (c.effect == EffectType.Freeze ? " In a duel, they lose their next turn." : "");
-        if (voice != null && c.voice != null)
-        {
-            voice.Stop();
-            voice.PlayOneShot(c.voice);
-        }
+        if (voice != null && c.voice != null) { voice.Stop(); voice.PlayOneShot(c.voice); }
         Refresh();
     }
 
@@ -93,38 +88,22 @@ public class CardHand : MonoBehaviour
         rest[selected] = restTurns + 1;
         myTurn = false;
         LastCard = c;
-        if (c.effect == EffectType.Heal || c.effect == EffectType.Shield)
-        {
-            if (c.effect == EffectType.Heal) owner.Heal(c.power);
-            else owner.AddStatus(StatusType.Shielded, 0f, 999f);
-            Refresh();
-            CardResolved?.Invoke(c, true);
-            return;
-        }
+        if (c.effect == EffectType.Heal) owner.Heal(c.power);
+        if (c.effect == EffectType.Shield) owner.AddStatus(StatusType.Shielded, 0f, 999f);
+        Refresh();
+        if (c.effect == EffectType.Heal || c.effect == EffectType.Shield) { CardResolved?.Invoke(c, true); return; }
         ThrowableCard card = Instantiate(cardPrefab, throwPoint.position, throwPoint.rotation);
         card.Setup(c, faceTemplate, game != null ? game.AimAssist : 1f, 999f);
         card.Thrown += t => CardThrown?.Invoke(t);
-        card.Landed += OnLanded;
+        card.Landed += (k, target, speed) => { hit = target.GetComponentInParent<Fighter>() != null; CardLanded?.Invoke(k, target, speed); };
         hit = false;
-        Refresh();
         StartCoroutine(Watch(card));
-    }
-
-    private void OnLanded(ThrowableCard card, Collider target, float speed)
-    {
-        hit = target.GetComponentInParent<Fighter>() != null;
-        CardLanded?.Invoke(card, target, speed);
     }
 
     private IEnumerator Watch(ThrowableCard card)
     {
         status.text = "Grab the card in front of you and throw it!";
-        float t = 0f;
-        while (card.Floating && t < throwWindow)
-        {
-            t += Time.deltaTime;
-            yield return null;
-        }
+        for (float t = 0f; card.Floating && t < throwWindow; t += Time.deltaTime) yield return null;
         for (float w = 0f; w < 3.5f && !card.Floating && !hit; w += Time.deltaTime) yield return null;
         yield return new WaitForSeconds(0.3f);
         Destroy(card.gameObject);
@@ -150,12 +129,17 @@ public class CardHand : MonoBehaviour
         bool can = selected >= 0 && selected < deck.Count && Ready(selected);
         playButton.interactable = can;
         playLabel.text = !myTurn ? "WAIT FOR YOUR TURN" : (selected < 0 ? "PICK A CARD" : (can ? "PLAY CARD" : "CAN'T PLAY"));
-        if (myTurn) status.text = "Your turn  ·  Libido " + owner.Libido;
-        else status.text = "Opponent's turn";
+        status.text = myTurn ? "Your turn  ·  Libido " + owner.Libido : "Opponent's turn";
     }
 
-    private void Update()
+    public static Collider FindTarget(Vector3 from, Vector3 v, float cone)
     {
-        if (myTurn && Time.frameCount % 15 == 0) Refresh();
+        Collider best = null;
+        foreach (Collider c in Physics.OverlapSphere(from, 25f))
+        {
+            float a = Vector3.Angle(v, c.bounds.center - from);
+            if (c.CompareTag("Target") && a < cone) { cone = a; best = c; }
+        }
+        return best;
     }
 }

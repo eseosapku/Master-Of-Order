@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 0
   description: Your last attack repeats at 50% two seconds later.
   art: {fileID: 2800000, guid: 531b03ae690d5c649b96ae39f37e885a, type: 3}
+  voice: {fileID: 8300000, guid: 6f55cf847ed7d454287a03c43834e724, type: 3}

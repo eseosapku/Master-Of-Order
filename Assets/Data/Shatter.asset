@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Destroy an active card effect on the field.
   art: {fileID: 2800000, guid: 8b8be9dae35036b4ba2fe744d78fcc06, type: 3}
+  voice: {fileID: 8300000, guid: b8833d9d6f4169948933a9a3a46b2126, type: 3}

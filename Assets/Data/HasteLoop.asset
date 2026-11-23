@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Move at 1.5x speed for 6 s, then 0.5x for 3 s.
   art: {fileID: 2800000, guid: 100a9ee671c26c14290f5fd783faf5bd, type: 3}
+  voice: {fileID: 8300000, guid: bb5158dba79492148a6ecbc42db982dc, type: 3}

@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Break every link; each deals 10 to its owner.
   art: {fileID: 2800000, guid: f285a1485d9157441a46e57209b37f49, type: 3}
+  voice: {fileID: 8300000, guid: 91b202310577cf24d950c2f764f04e8d, type: 3}

@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: The enemy's next card has a 40% chance to fizzle.
   art: {fileID: 2800000, guid: 4ea6e661d82ec8044be0994c99c9db68, type: 3}
+  voice: {fileID: 8300000, guid: 5e1fa1eb1bb48274094adebaa0ce9f31, type: 3}

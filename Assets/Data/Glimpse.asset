@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: See the enemy's next card for 5 seconds.
   art: {fileID: 2800000, guid: 78ae2a4d4d93216449a926603b5ec1cf, type: 3}
+  voice: {fileID: 8300000, guid: 40dba29c9c94855459339c196f985aaf, type: 3}

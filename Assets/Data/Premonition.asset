@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Name a family. If the enemy plays it, it fizzles.
   art: {fileID: 2800000, guid: 78ae2a4d4d93216449a926603b5ec1cf, type: 3}
+  voice: {fileID: 8300000, guid: 165e4307b19843c459e1ffdf094c5cac, type: 3}

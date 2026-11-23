@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Speak the enemy's true name to stop them for 5 s.
   art: {fileID: 2800000, guid: 3fe352ee6e6e2684baa9e7d8fad65fad, type: 3}
+  voice: {fileID: 8300000, guid: fcebf49dcee45b64ca46014b49792847, type: 3}

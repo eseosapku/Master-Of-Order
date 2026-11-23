@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 0
   description: Passes straight through Ward cards.
   art: {fileID: 2800000, guid: 8b8be9dae35036b4ba2fe744d78fcc06, type: 3}
+  voice: {fileID: 8300000, guid: f0f32cb6f0c1f13448fcfdb22aebc3c6, type: 3}

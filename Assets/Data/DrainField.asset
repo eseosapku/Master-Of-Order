@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Enemies inside lose 1 Libido per second.
   art: {fileID: 2800000, guid: be71d3d2bad2b394399a178be9e73e4f, type: 3}
+  voice: {fileID: 8300000, guid: e5f7ceb6b3f4b7b4ab9a41d40e146d80, type: 3}

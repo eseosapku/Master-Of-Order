@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Take 10 now; your next 3 hits deal 50% more.
   art: {fileID: 2800000, guid: 714d4bc28cd2d934692817ffd6b38f88, type: 3}
+  voice: {fileID: 8300000, guid: 154a3ba01f428984593bb4dc6ee9268d, type: 3}

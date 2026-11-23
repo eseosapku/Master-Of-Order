@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: A fallen ally cannot be revived next round.
   art: {fileID: 2800000, guid: 3fe352ee6e6e2684baa9e7d8fad65fad, type: 3}
+  voice: {fileID: 8300000, guid: 586d11a44309ecd49a4665930ab59716, type: 3}

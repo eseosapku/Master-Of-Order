@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class TrustTracker : MonoBehaviour
 {
-    [SerializeField] private CardOrbit orbit;
+    [SerializeField] private CardHand orbit;
     [SerializeField] private TrialManager trials;
     [SerializeField] private GameManager game;
     [SerializeField] private CutFloor cut;

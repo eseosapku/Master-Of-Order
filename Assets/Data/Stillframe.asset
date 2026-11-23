@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Freeze an enemy for 3 seconds.
   art: {fileID: 2800000, guid: 100a9ee671c26c14290f5fd783faf5bd, type: 3}
+  voice: {fileID: 8300000, guid: c539268a34ce3f44dbc92cdd465392ef, type: 3}

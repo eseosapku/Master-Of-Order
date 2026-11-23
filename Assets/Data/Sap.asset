@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Steal 2 Libido.
   art: {fileID: 2800000, guid: be71d3d2bad2b394399a178be9e73e4f, type: 3}
+  voice: {fileID: 8300000, guid: 44b54b3b29f78304abe3aec3530cb985, type: 3}

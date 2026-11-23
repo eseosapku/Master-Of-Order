@@ -8,7 +8,7 @@ public class CutFloor : MonoBehaviour
 {
     [SerializeField] private TrialManager trials;
     [SerializeField] private GameManager game;
-    [SerializeField] private CardOrbit orbit;
+    [SerializeField] private CardHand orbit;
     [SerializeField] private Rigidbody tilePrefab;
     [SerializeField] private TMP_Text banner;
     [SerializeField] private TMP_Text subtitle;

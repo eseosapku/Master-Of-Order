@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: If you lose this round, the winner loses a card.
   art: {fileID: 2800000, guid: 714d4bc28cd2d934692817ffd6b38f88, type: 3}
+  voice: {fileID: 8300000, guid: f1e33d3f65f02cd4b9407bca8be073cd, type: 3}

@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: All your damage on the target heals you 25%.
   art: {fileID: 2800000, guid: 6b45a14013720ee4fab4ccde74c96de9, type: 3}
+  voice: {fileID: 8300000, guid: ab5cccfada7af634dbd22667fafb41ed, type: 3}

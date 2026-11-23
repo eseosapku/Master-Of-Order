@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Their next card costs double; you get the extra.
   art: {fileID: 2800000, guid: be71d3d2bad2b394399a178be9e73e4f, type: 3}
+  voice: {fileID: 8300000, guid: e1134fd0716e81049a7330fcae8671ac, type: 3}

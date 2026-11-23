@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Split damage to you 50/50 with the enemy.
   art: {fileID: 2800000, guid: f285a1485d9157441a46e57209b37f49, type: 3}
+  voice: {fileID: 8300000, guid: f67a0bb0d43a2ae4cbf83b5f1b389373, type: 3}

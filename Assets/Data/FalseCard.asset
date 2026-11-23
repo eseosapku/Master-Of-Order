@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Throw a bluff disguised as any card.
   art: {fileID: 2800000, guid: b8df90b682674db47940f46bdc8591ae, type: 3}
+  voice: {fileID: 8300000, guid: 3f3202d86e6146e4c9d8ea0988fc8cf9, type: 3}

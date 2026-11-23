@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 0
   description: A spectral hound chases the marked target.
   art: {fileID: 2800000, guid: b4c5d4bcf53785043b3734389efa02e1, type: 3}
+  voice: {fileID: 8300000, guid: 391f3bf405add0548a71a41d09eff24c, type: 3}

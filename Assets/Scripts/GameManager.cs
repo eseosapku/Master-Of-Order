@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private FloorState startState = FloorState.Menu;
     [SerializeField] private List<StateView> views = new List<StateView>();
     [SerializeField] private ArchiveDraft archive;
-    [SerializeField] private CardOrbit orbit;
+    [SerializeField] private CardHand orbit;
     [SerializeField] private AudioSource clickSound;
 
     public event Action<FloorState> StateChanged;

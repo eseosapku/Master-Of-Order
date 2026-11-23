@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Everything near you moves at 25% speed, your throws too.
   art: {fileID: 2800000, guid: 100a9ee671c26c14290f5fd783faf5bd, type: 3}
+  voice: {fileID: 8300000, guid: 3d7c2250d7d7f874aa3fcbd0c666c606, type: 3}

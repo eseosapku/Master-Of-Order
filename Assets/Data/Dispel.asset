@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: End one active enemy effect.
   art: {fileID: 2800000, guid: a184c884bed23924c8cd120004194820, type: 3}
+  voice: {fileID: 8300000, guid: 1dca5295dd526eb429673645da5e1b4d, type: 3}

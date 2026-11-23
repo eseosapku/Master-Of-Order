@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 0
   description: Damage dealt this round repeats next round.
   art: {fileID: 2800000, guid: 531b03ae690d5c649b96ae39f37e885a, type: 3}
+  voice: {fileID: 8300000, guid: dd262f71f42d9c84fb473aea942e3ba0, type: 3}

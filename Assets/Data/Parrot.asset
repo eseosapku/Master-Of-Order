@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Echo the enemy's shout to weaken their next card.
   art: {fileID: 2800000, guid: 03f669967ae156d4ab5e4f65fc710f1c, type: 3}
+  voice: {fileID: 8300000, guid: 491caf6301c5ce242b2a3537fdf2ad5e, type: 3}

@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Take the enemy's stats for 6 seconds.
   art: {fileID: 2800000, guid: 03f669967ae156d4ab5e4f65fc710f1c, type: 3}
+  voice: {fileID: 8300000, guid: 5f03cefd295b9e9409f85cb9db5938c4, type: 3}

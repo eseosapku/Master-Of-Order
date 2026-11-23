@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Your throws fly faster and further this round.
   art: {fileID: 2800000, guid: a3cfa1dc783e3e1458e7f80ac9d372aa, type: 3}
+  voice: {fileID: 8300000, guid: 60b3e707b8550ae49be3c5ca10bec2e3, type: 3}

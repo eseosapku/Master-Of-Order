@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Tether an enemy within 2 metres of their spot.
   art: {fileID: 2800000, guid: 3fe352ee6e6e2684baa9e7d8fad65fad, type: 3}
+  voice: {fileID: 8300000, guid: 5584cf1cbd8a09844982b5b865617c82, type: 3}

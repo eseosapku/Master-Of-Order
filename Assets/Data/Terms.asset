@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Ban an action. Breaking it costs the enemy 25.
   art: {fileID: 2800000, guid: 714d4bc28cd2d934692817ffd6b38f88, type: 3}
+  voice: {fileID: 8300000, guid: cbf050c9f2c270947b5a2e3703578a0b, type: 3}

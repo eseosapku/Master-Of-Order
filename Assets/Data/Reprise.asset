@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Replay the last card you used without spending it.
   art: {fileID: 2800000, guid: 531b03ae690d5c649b96ae39f37e885a, type: 3}
+  voice: {fileID: 8300000, guid: a5bea6d5de338ec4fbdf3c6fd7ae9c67, type: 3}

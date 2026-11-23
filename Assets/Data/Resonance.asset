@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 0
   description: Each consecutive hit on one target deals 15% more.
   art: {fileID: 2800000, guid: 531b03ae690d5c649b96ae39f37e885a, type: 3}
+  voice: {fileID: 8300000, guid: 8936aa823a7ee874db04c14b7fb9433b, type: 3}

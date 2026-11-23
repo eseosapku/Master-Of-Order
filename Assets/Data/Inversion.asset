@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: The enemy's next buff becomes a debuff.
   art: {fileID: 2800000, guid: ae3e96b56ef26bc4bbc7747b5d3d993d, type: 3}
+  voice: {fileID: 8300000, guid: b042b35de6344094c8ed428a7a5f9eee, type: 3}

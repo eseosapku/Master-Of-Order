@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Restore 30 Ego.
   art: {fileID: 2800000, guid: 580520b79f858334a9e0ea15c6bbe2d2, type: 3}
+  voice: {fileID: 8300000, guid: 09933653fe4a34746b8cf7054ab4ad69, type: 3}

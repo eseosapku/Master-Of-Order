@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Move every status on you to the enemy.
   art: {fileID: 2800000, guid: ae3e96b56ef26bc4bbc7747b5d3d993d, type: 3}
+  voice: {fileID: 8300000, guid: 541d100fbf7cdff42ac9c6c5fe203b81, type: 3}

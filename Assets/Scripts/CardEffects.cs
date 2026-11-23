@@ -6,7 +6,7 @@ using UnityEngine.XR;
 
 public class CardEffects : MonoBehaviour
 {
-    [SerializeField] private CardOrbit orbit;
+    [SerializeField] private CardHand orbit;
     [SerializeField] private ParticleSystem burstPrefab;
     [SerializeField] private TextMeshPro popupPrefab;
     [SerializeField] private AudioSource hitSound;

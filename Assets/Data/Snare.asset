@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: A hidden trap roots whoever steps in for 3 s.
   art: {fileID: 2800000, guid: b4c5d4bcf53785043b3734389efa02e1, type: 3}
+  voice: {fileID: 8300000, guid: 133cb2793148c4f4c9255a759eeb6dc4, type: 3}

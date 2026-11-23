@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Return your position and Body to 3 seconds ago. Libido stays spent.
   art: {fileID: 2800000, guid: 100a9ee671c26c14290f5fd783faf5bd, type: 3}
+  voice: {fileID: 8300000, guid: afd598010df88bd408b127c91507f9e5, type: 3}

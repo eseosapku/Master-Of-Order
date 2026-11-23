@@ -89,7 +89,7 @@ public class ThrowableCard : MonoBehaviour
         }
         Buzz(args.interactorObject, 0.6f, 0.08f);
         Vector3 v = handVelocity * throwScale;
-        Collider target = assist > 0f ? CardOrbit.FindTarget(transform.position, v, assist > 1.5f ? 22f : 10f) : null;
+        Collider target = assist > 0f ? CardHand.FindTarget(transform.position, v, assist > 1.5f ? 22f : 10f) : null;
         if (target != null) v = Vector3.Slerp(v.normalized, (target.bounds.center - transform.position).normalized, assist > 1.5f ? 0.85f : 0.5f) * v.magnitude;
         state = CardState.Flying;
         life = 0f;

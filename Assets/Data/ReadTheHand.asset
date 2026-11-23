@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Reveal 2 hidden enemy cards for the bout.
   art: {fileID: 2800000, guid: 78ae2a4d4d93216449a926603b5ec1cf, type: 3}
+  voice: {fileID: 8300000, guid: bc3bbd63149c5b34a9c4f7aae71609c5, type: 3}

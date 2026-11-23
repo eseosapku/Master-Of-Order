@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Poison that ticks for 6 seconds.
   art: {fileID: 2800000, guid: eae6e939339b50049a51298ab8a1a699, type: 3}
+  voice: {fileID: 8300000, guid: b0088af171ac46c458756109e0d66acb, type: 3}

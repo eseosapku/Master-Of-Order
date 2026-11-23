@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 0
   description: Spend all Libido. Deal twice what you spent.
   art: {fileID: 2800000, guid: 4ea6e661d82ec8044be0994c99c9db68, type: 3}
+  voice: {fileID: 8300000, guid: 18adf972fa728b74e8cebbd03f8957ed, type: 3}

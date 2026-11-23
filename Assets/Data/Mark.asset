@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: The marked target takes 20% more from all sources.
   art: {fileID: 2800000, guid: b4c5d4bcf53785043b3734389efa02e1, type: 3}
+  voice: {fileID: 8300000, guid: aace107748e38b94089a731215543d26, type: 3}

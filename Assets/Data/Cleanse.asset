@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Remove every status on you.
   art: {fileID: 2800000, guid: 580520b79f858334a9e0ea15c6bbe2d2, type: 3}
+  voice: {fileID: 8300000, guid: 3a0899037c742ad4d93d99218969f1d2, type: 3}

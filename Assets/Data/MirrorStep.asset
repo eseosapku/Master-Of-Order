@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Copy the enemy's movement, flipped, for 6 s.
   art: {fileID: 2800000, guid: ae3e96b56ef26bc4bbc7747b5d3d993d, type: 3}
+  voice: {fileID: 8300000, guid: bb1f9286ec8e2b240bc7ebdda4ef35f2, type: 3}

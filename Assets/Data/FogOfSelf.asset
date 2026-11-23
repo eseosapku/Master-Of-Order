@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Become invisible for 4 seconds.
   art: {fileID: 2800000, guid: b8df90b682674db47940f46bdc8591ae, type: 3}
+  voice: {fileID: 8300000, guid: 11239b6ea5b1ae04dae6577f100209d2, type: 3}

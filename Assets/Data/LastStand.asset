@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Survive one lethal hit at 1 Body.
   art: {fileID: 2800000, guid: 2e6ef8917e843a94abd08986880d3e04, type: 3}
+  voice: {fileID: 8300000, guid: 2a202d6998fc07340bb8475df53ef688, type: 3}

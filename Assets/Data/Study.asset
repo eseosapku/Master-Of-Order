@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: After 3 enemy hits land, copy one for free.
   art: {fileID: 2800000, guid: 03f669967ae156d4ab5e4f65fc710f1c, type: 3}
+  voice: {fileID: 8300000, guid: 358b9b876caa8ad4aa8422ace9e981ce, type: 3}

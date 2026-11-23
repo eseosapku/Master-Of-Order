@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Block and return 30% of the damage.
   art: {fileID: 2800000, guid: 2e6ef8917e843a94abd08986880d3e04, type: 3}
+  voice: {fileID: 8300000, guid: d93aa172c22404546a8bb16f70d5085d, type: 3}

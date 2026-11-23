@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Swap one Orbit card for a random Archive card.
   art: {fileID: 2800000, guid: 4ea6e661d82ec8044be0994c99c9db68, type: 3}
+  voice: {fileID: 8300000, guid: a6fd1dabc18194147bf7742464022e42, type: 3}

@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Drain 5 Body per second while within 3 m.
   art: {fileID: 2800000, guid: 6b45a14013720ee4fab4ccde74c96de9, type: 3}
+  voice: {fileID: 8300000, guid: 5f031a5698ef07542bf63e8467a259c9, type: 3}

@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Heal 15 Body.
   art: {fileID: 2800000, guid: 580520b79f858334a9e0ea15c6bbe2d2, type: 3}
+  voice: {fileID: 8300000, guid: 27779aa6c6161f545833abc207462e11, type: 3}

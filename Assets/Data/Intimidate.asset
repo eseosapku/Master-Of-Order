@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Push the enemy back 3 metres.
   art: {fileID: 2800000, guid: 8552e4a4d78c97440b49b3982978aa18, type: 3}
+  voice: {fileID: 8300000, guid: 65485d7ed2e30d74faa8e5ea038555c2, type: 3}

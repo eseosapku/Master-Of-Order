@@ -21,3 +21,4 @@ MonoBehaviour:
   duration: 3
   description: Swap your speed with the enemy's for 5 s.
   art: {fileID: 2800000, guid: a3cfa1dc783e3e1458e7f80ac9d372aa, type: 3}
+  voice: {fileID: 8300000, guid: a380283927dd1234a81e35948f208af7, type: 3}
