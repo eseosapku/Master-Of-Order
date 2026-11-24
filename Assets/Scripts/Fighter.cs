@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum StatusType { Poison, Slowed, Skip, Doubled, Fumble }
+public enum StatusType { Poison, Slowed, Skip, Doubled, Fumble, Extra }
 
 public class Fighter : MonoBehaviour
 {
@@ -42,6 +42,13 @@ public class Fighter : MonoBehaviour
     {
         if (!Statuses.Remove(t)) return false;
         Changed?.Invoke(this);
+        return true;
+    }
+
+    public bool TakeExtra()
+    {
+        if (!Statuses.TryGetValue(StatusType.Extra, out int left)) return false;
+        if (left <= 1) Statuses.Remove(StatusType.Extra); else Statuses[StatusType.Extra] = left - 1;
         return true;
     }
 

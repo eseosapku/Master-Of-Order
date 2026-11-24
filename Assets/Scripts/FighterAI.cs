@@ -97,7 +97,7 @@ public class FighterAI : MonoBehaviour, ISatchel
             case Special.Mirror: case Special.Negate: v = mine ? -10f : 11f; break;
             case Special.Cleanse: v = fighter.Statuses.Count > 0 || rest.Exists(r => r > 2) ? 12f : -15f; break;
             case Special.Erosion: case Special.LoadedDie: v = mine ? -5f : 15f; break;
-            case Special.Stillframe: v = 9f; break;
+            case Special.Stillframe: v = 14f; break;
             case Special.Glimpse: v = board.HasHidden(foe) ? 12f : 1f; break;
             case Special.Double: v = fighter.Has(StatusType.Doubled) ? -10f : 7f; break;
             case Special.Thief: v = 6f; break;

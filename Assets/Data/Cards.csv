@@ -13,7 +13,7 @@ Negate,Thinking,Seal,Hidden,3,0,0,0,0,Poison,0,Negate,"Hidden. Cancels the next 
 Slow,Thinking,Chrono,Instant,2,0,0,0,0,Slowed,3,None,The rival's cards cost 2 more Libido for their next 2 turns. Countered by Cleanse.,Slowed. Their cards cost two more.
 Seal,Thinking,Binding,Instant,2,0,0,0,0,Poison,0,Seal,The last card the rival played cannot be used for 3 turns. Countered by Cleanse.,Sealed for three turns.
 Erosion,Thinking,Dread,Field,4,0,0,20,0,Poison,0,Erosion,"Field. At the start of each of your turns, one of the rival's cards is sealed for the rest of the duel. Breaks after 20 damage. Countered by Shatter.",Erosion sets in.
-Stillframe,Thinking,Chrono,Instant,3,0,0,0,0,Poison,0,Stillframe,Call the coin. Right: the rival loses their next turn. Wrong: you lose yours. Countered by Negate.,
+Stillframe,Thinking,Chrono,Instant,3,0,0,0,0,Poison,0,Stillframe,Call the coin. Right: you take two moves back to back before the rival acts. Wrong: you lose your next turn. Countered by Negate.,
 Glimpse,Intuition,Foresight,Instant,1,0,0,0,0,Poison,0,Glimpse,See the rival's planned card and turn their hidden cards face up.,Glimpse. Their plan is revealed.
 Double or Nothing,Intuition,Fortune,Instant,2,0,0,0,0,Poison,0,Double,Call the coin. Right: your next attack deals double. Wrong: your next attack fizzles.,
 Thief,Intuition,Mimic,Instant,2,0,0,0,0,Poison,0,Thief,Call the coin. Right: steal one of the rival's cards for this duel. Wrong: they steal one of yours.,

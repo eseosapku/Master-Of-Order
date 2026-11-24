@@ -92,7 +92,7 @@ public class Board : MonoBehaviour
         switch (c.special)
         {
             case Special.Gamble: if (call) { Say(right, voice); break; } Say(right + "  ·  Gamble Blow hits " + caster.DisplayName + " for " + c.damage, voice); caster.Damage(c.damage); return;
-            case Special.Stillframe: (call ? foe : caster).AddStatus(StatusType.Skip, 1); Say(right + "  ·  " + (call ? foe : caster).DisplayName + " will lose the next turn", voice); return;
+            case Special.Stillframe: caster.AddStatus(call ? StatusType.Extra : StatusType.Skip, call ? 2 : 1); Say(right + "  ·  " + (call ? Does(caster, "get") + " two moves in a row" : Does(caster, "lose") + " the next turn"), voice); return;
             case Special.Double: caster.AddStatus(call ? StatusType.Doubled : StatusType.Fumble, 99); Say(right + "  ·  " + caster.Possessive + " next attack " + (call ? "deals double" : "will fizzle"), voice); return;
             case Special.Thief:
                 Fighter from = call ? foe : caster, to = call ? caster : foe;

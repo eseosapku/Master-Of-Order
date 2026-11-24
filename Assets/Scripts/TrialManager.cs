@@ -37,7 +37,7 @@ public class TrialManager : MonoBehaviour
     private void OnEnable() { game.StateChanged += OnState; hand.CardResolved += OnResolved; }
     private void OnDisable() { game.StateChanged -= OnState; hand.CardResolved -= OnResolved; }
     private void OnResolved(CardData c) { resolved = true; played = c; }
-    public void Choose(int option) { choice = option; ChoiceMade?.Invoke(); }
+    public void Choose(int option) { choice = option; ChoiceMade?.Invoke(); if (running != null) return; Halt(); game.SetState(option == 1 ? FloorState.Hall : option == 2 ? FloorState.Archive : FloorState.Menu); }
     public void StartDuel(Fighter traitor) => running = StartCoroutine(Duel(traitor));
 
     private void OnState(FloorState s)
@@ -103,8 +103,8 @@ public class TrialManager : MonoBehaviour
         while (!player.IsDown && !foe.IsDown)
         {
             RoundStarted?.Invoke(++Round);
-            yield return Turn(player, foe);
-            if (!player.IsDown && !foe.IsDown) yield return Turn(foe, player);
+            do yield return Turn(player, foe); while (player.TakeExtra() && !player.IsDown && !foe.IsDown);
+            if (!player.IsDown && !foe.IsDown) do yield return Turn(foe, player); while (foe.TakeExtra() && !player.IsDown && !foe.IsDown);
         }
         board.Clear();
         lastWin = !player.IsDown;

@@ -5,6 +5,7 @@ using UnityEngine;
 public class DuelAnnouncer : MonoBehaviour
 {
     [SerializeField] private TrialManager trials;
+    [SerializeField] private GameManager game;
     [SerializeField] private Board board;
     [SerializeField] private CoinFlip coin;
     [SerializeField] private CardHand hand;
@@ -20,11 +21,16 @@ public class DuelAnnouncer : MonoBehaviour
 
     private readonly List<string> log = new List<string>();
     private readonly Queue<AudioClip> queue = new Queue<AudioClip>();
+    private readonly Dictionary<string, AudioClip> clips = new Dictionary<string, AudioClip>();
     private Fighter actor;
     private Fighter[] fighters = new Fighter[0];
     private int shownClock = -1;
+    private void Awake()
+    {
+        fighters = FindObjectsByType<Fighter>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (AudioClip c in lines) if (c != null) clips[c.name] = c;
+    }
 
-    private void Awake() => fighters = FindObjectsByType<Fighter>(FindObjectsInactive.Include, FindObjectsSortMode.None);
     private static string Key(Fighter f) => f.DisplayName.Split(' ')[0];
     private static string Pascal(string n) => string.Concat(System.Array.ConvertAll(n.Replace("-", " ").Replace("'", "").Split(' '), w => w.Length > 0 ? char.ToUpper(w[0]) + w.Substring(1) : ""));
     private void OnHurt(Fighter f, float amount) => Say("Hurt" + Key(f) + Mathf.RoundToInt(amount));
@@ -35,12 +41,12 @@ public class DuelAnnouncer : MonoBehaviour
     private void Listen(bool on)
     {
         trials.Message -= OnMessage; trials.BoutStarted -= OnBoutStarted; trials.TurnStarted -= OnTurnStarted;
-        trials.TurnResolved -= OnResolved; trials.BoutEnded -= OnBoutEnded; trials.ChoiceMade -= Hide;
+        trials.TurnResolved -= OnResolved; trials.BoutEnded -= OnBoutEnded; trials.ChoiceMade -= Hide; game.StateChanged -= OnState;
         board.Note -= OnNote; board.Landed -= OnLanded; board.IntentRevealed -= OnIntent; coin.Called -= OnCalled; coin.Flipped -= OnFlipped;
         foreach (Fighter f in fighters) { f.Damaged -= OnHurt; if (on) f.Damaged += OnHurt; }
         if (!on) return;
         trials.Message += OnMessage; trials.BoutStarted += OnBoutStarted; trials.TurnStarted += OnTurnStarted;
-        trials.TurnResolved += OnResolved; trials.BoutEnded += OnBoutEnded; trials.ChoiceMade += Hide;
+        trials.TurnResolved += OnResolved; trials.BoutEnded += OnBoutEnded; trials.ChoiceMade += Hide; game.StateChanged += OnState;
         board.Note += OnNote; board.Landed += OnLanded; board.IntentRevealed += OnIntent; coin.Called += OnCalled; coin.Flipped += OnFlipped;
     }
 
@@ -56,8 +62,7 @@ public class DuelAnnouncer : MonoBehaviour
 
     private void Say(string key)
     {
-        if (string.IsNullOrEmpty(key)) return;
-        foreach (AudioClip c in lines) if (c != null && c.name == "Voice" + key) { queue.Enqueue(c); return; }
+        if (!string.IsNullOrEmpty(key) && clips.TryGetValue("Voice" + key, out AudioClip c)) queue.Enqueue(c);
     }
 
     private void Log(string line)
@@ -117,16 +122,29 @@ public class DuelAnnouncer : MonoBehaviour
         if (c == null && f == trials.Player) Say("TimeUp");
     }
 
+    private void OnState(FloorState s)
+    {
+        if (s == FloorState.Reward) ShowPanel("FLOOR I CLEARED", "Every rival has fallen. The tower opens above you." + System.Environment.NewLine + "<size=75%>MASTER OF ORDER  ·  thanks for playing</size>", false, "PLAY AGAIN", "Victory");
+        if (s == FloorState.Menu || s == FloorState.Archive || s == FloorState.Hall) Hide();
+    }
+
     private void OnBoutEnded(int index, bool won)
     {
         Fighter foe = trials.SideB.Length > 0 ? trials.SideB[0] : null;
-        resultTitle.text = won ? "VICTORY" : "DEFEAT";
-        resultText.text = foe == null ? "" : won ? foe.DisplayName + " falls.  You stand with " + Mathf.CeilToInt(trials.Player.Body) + " Body." : foe.DisplayName + " wins with " + Mathf.CeilToInt(foe.Body) + " Body left.";
-        continueButton.SetActive(won);
+        string text = foe == null ? "" : won ? foe.DisplayName + " falls.  You stand with " + Mathf.CeilToInt(trials.Player.Body) + " Body." : foe.DisplayName + " wins with " + Mathf.CeilToInt(foe.Body) + " Body left.";
+        ShowPanel(won ? "VICTORY" : "DEFEAT", text, won, "REMATCH", won ? "Victory" : "Defeat");
+    }
+
+    private void ShowPanel(string heading, string text, bool canContinue, string again, string voiceKey)
+    {
+        resultTitle.text = heading;
+        resultText.text = text;
+        continueButton.SetActive(canContinue);
+        resultPanel.transform.Find("REMATCH").GetComponentInChildren<TMP_Text>().text = again;
         Transform h = head != null ? head : Camera.main.transform;
         Vector3 flat = Vector3.ProjectOnPlane(h.forward, Vector3.up).normalized;
         resultPanel.transform.SetPositionAndRotation(h.position + flat * panelDistance, Quaternion.LookRotation(flat));
         resultPanel.SetActive(true);
-        Say(won ? "Victory" : "Defeat");
+        Say(voiceKey);
     }
 }

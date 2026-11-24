@@ -24,6 +24,6 @@ MonoBehaviour:
   guard: 0
   status: 0
   special: 9
-  description: 'Call the coin. Right: the rival loses their next turn. Wrong: you lose yours. Countered by Negate.'
+  description: 'Call the coin. Right: you take two moves back to back before the rival acts. Wrong: you lose your next turn. Countered by Negate.'
   art: {fileID: 2800000, guid: 100a9ee671c26c14290f5fd783faf5bd, type: 3}
   voice: {fileID: 0}

@@ -25,6 +25,7 @@ public class CardEffects : MonoBehaviour
     private readonly Dictionary<FieldUnit, ThrowableCard> shown = new Dictionary<FieldUnit, ThrowableCard>();
     private Fighter[] fighters = new Fighter[0];
     private int nextBurst, nextPopup;
+    private readonly Dictionary<Fighter, Animator> anims = new Dictionary<Fighter, Animator>();
 
     private void Awake()
     {
@@ -49,7 +50,7 @@ public class CardEffects : MonoBehaviour
         board.UnitPlaced += OnPlaced; board.UnitChanged += OnChanged; board.UnitRemoved += OnRemoved; ThrowableCard.Launched += OnLaunched; ThrowableCard.Arrived += OnArrived;
     }
 
-    private static Animator Anim(Fighter f) { Animator a = f.GetComponent<Animator>(); return a != null && a.runtimeAnimatorController != null ? a : null; }
+    private Animator Anim(Fighter f) { if (!anims.TryGetValue(f, out Animator a)) { a = f.GetComponent<Animator>(); anims[f] = a = a != null && a.runtimeAnimatorController != null ? a : null; } return a; }
     private void OnArrived(ThrowableCard c, Vector3 at) => Burst(at, functionColors[(int)c.Data.function], 4f);
     private void OnFighter(Fighter f) { if (Anim(f) != null) Anim(f).speed = f.Has(StatusType.Skip) && !f.IsDown ? 0f : 1f; }
 
