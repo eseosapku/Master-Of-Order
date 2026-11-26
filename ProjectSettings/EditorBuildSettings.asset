@@ -9,5 +9,6 @@ EditorBuildSettings:
     path: Assets/Scenes/ThresholdHall.unity
     guid: 3ccbec14a8734cf47b435c5864641047
   m_configObjects:
+    com.unity.input.settings: {fileID: 11400000, guid: f42fdfa533d6aa14ebdac4eacefdc202, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 252bea5c0aac647f381f7ac71f9619c7, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 30b1e90f667fda34192c5a5f34fda1c6, type: 2}
